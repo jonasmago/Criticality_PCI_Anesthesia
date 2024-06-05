@@ -1,0 +1,10 @@
+antropy==0.1.4
+edgeofpy==0.0.0
+fooof==1.0.0
+mne==1.1.1
+neurokit2==0.2.2
+numpy==1.21.2
+pandas==1.4.3
+scikit_learn==1.2.2
+scipy==1.8.0
+utils==1.0.1
