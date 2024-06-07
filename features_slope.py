@@ -29,9 +29,9 @@ if __name__ == '__main__':
     parser.add_argument('-part_info', type=str, action='store',
                         help='path to txt with information about participants')
     parser.add_argument('-lfrequ', action='store',
-                        help='frequency to highpass filter ')
+                        help='frequency of lower end of the aperiodic component estimation ')
     parser.add_argument('-hfrequ', action='store',
-                        help='frequency to lowpass filter')
+                        help='frequency of higher end of the aperiodic component estimation')
 
 
     # read out arguments
@@ -68,9 +68,6 @@ if __name__ == '__main__':
         data = loadmat(input_fname)
         epochs = data['trails']
         fs = epochs[0].shape[1]/10
-
-        #data_test = loadmat('test_data.mat')['data_channel_filt'][0]
-        #METHODS_chaos.chaos.chaos_pipeline(data_test)
 
         # if data is too long only use the first 3 min of data
         nr_trials = min([len(epochs),30])

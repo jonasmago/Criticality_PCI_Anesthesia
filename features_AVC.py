@@ -36,7 +36,7 @@ if __name__ == '__main__':
                         help='# time bin for avalanche analysis. Fosque22: .004')
 
 
-    FIL_FREQ = (0.1, 40) # bandpass frequencies
+    FIL_FREQ = (0.5, 40) # bandpass frequencies
     THRESH_TYPE = 'both' # Fosque22: 'both'
 
     GAMMA_EXPONENT_RANGE = (0, 2)

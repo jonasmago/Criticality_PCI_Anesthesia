@@ -16,7 +16,7 @@ from scipy.fft import fft, ifft
 from scipy.signal import hilbert
 from scipy.fftpack import rfft, irfft
 
-# call:   python features_Pred.py -data_dir EPOCHS -output_dir RESULTS -part_info EPOCHS/participants.txt -lfrequ 0.1 -hfrequ 40
+# call:   python features_Pred.py -data_dir EPOCHS -output_dir RESULTS -part_info EPOCHS/participants.txt -lfrequ 0.5 -hfrequ 40
 
 def get_pred(trial, epochs):
     Lyaps = []
