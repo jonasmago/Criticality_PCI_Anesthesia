@@ -1,4 +1,4 @@
-    # Critical_PCI
+# Critical_PCI
 This repository contains all code used for the publication: 
 "Critical dynamics in spontaneous EEG predict anesthetic-induced loss of consciousness and perturbational complexity"
 
