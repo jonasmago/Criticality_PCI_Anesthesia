@@ -1,33 +1,36 @@
-### Data I need to create: 
+## Criticality/Complexity code applied to Jhana data
 
-[ ] participant info file 
-    [ ] ID
-    [ ] Cond
-    [ ] Drug
-[ ] data (currently in .mat format, change to .fif)
+## Segment length choice
+- `80 epochs` → this gives 72/80 good subjects ↔️ 90%
+- `15 min = 900s` → this gives 73/80 good subjects ↔️ 91.25%
+
+## Specific scripts, and waht still needs to be done: 
+* `avc_std_dist`: for later
+* `AVC`: 
+    * ~ 20 min
+    * -bin_treshold 2.0 -max_iei 0.008
+* `DFA`: 
+    * for all frequency bins
+    * ran for 20 min segments
+    * [ ] repeat for 15 min segments
+* `EOC`: 
+    * run with 'fixed`and `4Hz` cutoff
+    * takes ˜ 2hr
+* `EOS`: 
+    * 1-45Hz
+    * ran for 100 epochs 
+    * [ ] repeat for 80 epochs 
+* `Pred`: 
+    * 1-45HZ
+    * **takes super long!**
+    * [ ] ran for 100 epochs, change to 80 epochs
+* `Slope`: 
+    * 1-45HZ
+    * [ ] run for 80 epochs 
 
 
-## Figure out the best hyper parameter space here
-* AVC: 
-    * FIL_FREQ = (1, 40) # bandpass frequencies
-    * THRESH_TYPE = 'both' # Fosque22: 'both' —> ???
-    * GAMMA_EXPONENT_RANGE = (0, 2)
-    * LATTICE_SEARCH_STEP = 0.1
-    * BIN_THRESHOLD = float(2)
-    * MAX_IEI = float(0.008)
-    * BRANCHING_RATIO_TIME_BIN = float(1)
-* DFA
-    * lfreq = 0.1  # Low frequency filter
-    * hfreq = 40   # High frequency filter
-    * maximum of 200s 
-* EOC
-    * k_type = 'flex'
-* EOS
-    * minfreq = 0.1
-    * maxfreq = 40
-* Pred
-    * lfreq = 0.1
-    * hfreq = 40
-* Slope (did you do this for different frequency bins?)
-    * lfreq = 1
-    * hfreq = 40
+
+## What I am currently doing
+* repair bad channels (I currently do not count how many I repair, possible exclusion criteria)
+* filter data script specific (1-45Hz), or smaller bands
+
