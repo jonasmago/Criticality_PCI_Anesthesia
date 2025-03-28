@@ -1,4 +1,7 @@
-data/input/
-data/output/
-data/visualization/
+data/input/*
+data/input_old/*
+data/output/*
+data/output_old/*
+data/visualization/*
 venv/
+.Rproj.user
