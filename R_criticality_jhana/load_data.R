@@ -1,6 +1,7 @@
 library(data.table)
 library(dplyr)
 library(purrr)
+library(readxl)
 
 
 ##########################
@@ -31,24 +32,29 @@ read_and_select <- function(path) {
 # File paths
 file_paths <- c(
   "../data/output/AVC/AVC_bin_2.0_iei_0.008.csv",
+  
   # "../data/output/avc_std_dist/AVC_std_varley_raw.csv",
   # "../data/output/avc_std_dist/AVC_std_varley.csv",
+  
   "../data/output/DFA/DFA_1_4.csv",
   "../data/output/DFA/DFA_1_45.csv",
   "../data/output/DFA/DFA_4_8.csv",
   "../data/output/DFA/DFA_8_13.csv",
   "../data/output/DFA/DFA_13_30.csv",
-  "../data/output/DFA/DFA_30_44.csv",
-  "../data/output/EOC/01Chaos_fixed_4.csv",
+    "../data/output/DFA/DFA_30_45.csv",
+  
+  "../data/output/EOC/01Chaos_fixed_4.csv"
+  
   # "../data/output/EOC/K_space_fixed_4.csv",
-  "../data/output/EOS/EOS_1_4.csv",
-  "../data/output/EOS/EOS_1_45.csv",
-  "../data/output/EOS/EOS_4_8.csv",
-  "../data/output/EOS/EOS_8_13.csv",
-  "../data/output/EOS/EOS_13_30.csv",
-  "../data/output/EOS/EOS_30_45.csv",
+  #"../data/output/EOS/EOS_1_4.csv",
+  #"../data/output/EOS/EOS_1_45.csv",
+  #"../data/output/EOS/EOS_4_8.csv",
+  #"../data/output/EOS/EOS_8_13.csv",
+  #"../data/output/EOS/EOS_13_30.csv",
+  #"../data/output/EOS/EOS_30_45.csv",
+  
   # "../data/output/Slope/Slope_space.csv",
-  "../data/output/Slope/Slope.csv"
+  #"../data/output/Slope/Slope.csv"
 )
 
 # Load & clean each file
@@ -153,7 +159,7 @@ merged_full <- full_join(merged_data, phen_data, by = c("sub", "day", "condition
 print(dim(merged_full))
 head(merged_full)
 
-rm(data_list, phen_data, merged_data, cols, cols_to_drop, file_paths, i, modtas_cols, word_cols, read_and_select)
+# rm(data_list, phen_data, merged_data, cols, cols_to_drop, file_paths, i, modtas_cols, word_cols, read_and_select)
 
 cat(names(merged_full), sep = "\n")
 # outcomes_all <- names(merged_full)[4:(length(names(merged_full)) - 36)]
