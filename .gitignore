@@ -5,3 +5,4 @@ data/output_old/*
 data/visualization/*
 venv/
 .Rproj.user
+python_master_function/results/

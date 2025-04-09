@@ -97,4 +97,4 @@ def features_Pred (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices 
 
     pool.close()
     
-    return Lyaps_max, Dims_mean, Ent_mean, LZC_mean, KDF_mean, results, Lyaps_max_int, Dims_mean_int, Ent_mean_int, LZC_mean_int, KDF_mean_int, results_int 
+    return Lyaps_max, Dims_mean, Ent_mean, LZC_mean, KDF_mean, Lyaps_max_int, Dims_mean_int, Ent_mean_int, LZC_mean_int, KDF_mean_int, results, results_int 

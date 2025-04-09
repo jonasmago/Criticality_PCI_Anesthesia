@@ -21,9 +21,9 @@ import os
 
 
 # call:  python features_avc_std_dist.py -data_dir EPOCHS -output_dir RESULTS -part_info EPOCHS/participants.txt
-def features_avc_std_dist (raw, max_s=300, fs=256):
+def features_avc_std_dist (raw, max_s=300, fs=256, lfreq=0.5, hfreq=40):
 
-    FIL_FREQ = (0.5, 40) # bandpass frequencies
+    FIL_FREQ = (lfreq, hfreq) # bandpass frequencies
     THRESH_TYPE = 'both' # Fosque22: 'both'
 
 

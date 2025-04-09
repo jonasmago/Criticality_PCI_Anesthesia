@@ -23,10 +23,10 @@ np.int = int  # Patch deprecated alias before anything else uses it
 
 # call:  python features_AVC.py -data_dir EPOCHS -output_dir RESULTS -part_info EPOCHS/participants.txt -bin_treshold 1.5 -max_iei 0.004
 
-def features_AVC (raw, bin_threshold, max_iei, fs=256, max_s=200):
+def features_AVC (raw, bin_threshold, max_iei, fs=256, max_s=200, lfreq=0.5, hfreq=40):
 
 
-    FIL_FREQ = (0.5, 40) # bandpass frequencies
+    FIL_FREQ = (lfreq, hfreq) # bandpass frequencies
     THRESH_TYPE = 'both' # Fosque22: 'both'
 
     GAMMA_EXPONENT_RANGE = (0, 2)
