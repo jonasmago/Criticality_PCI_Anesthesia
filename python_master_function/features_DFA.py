@@ -48,7 +48,8 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=200, bad_indices=None):
         input = []
         for ch in range(nr_channels):
             input.append((data_filt[ch,:],fs))
-            #get_channel_hurst(data_filt[ch,:],fs)
+            get_channel_hurst(data_filt[ch,:],fs)
+
 
         pool = mp.Pool(mp.cpu_count())
         results = pool.starmap(get_channel_hurst,input)
