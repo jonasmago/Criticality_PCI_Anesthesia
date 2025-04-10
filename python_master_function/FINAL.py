@@ -105,6 +105,8 @@ if __name__ == "__main__":
                 })
             except Exception as e:
                 print(f"[EOC] Error: {e}")
+                import traceback; traceback.print_exc()
+                import pdb; pdb.set_trace()
 
         # ========== EOS ========== #
         if RUN_EOS:
@@ -114,6 +116,8 @@ if __name__ == "__main__":
                 dict_data['eos_results'] = eos_results
             except Exception as e:
                 print(f"[EOS] Error: {e}")
+                import traceback; traceback.print_exc()
+                import pdb; pdb.set_trace()
 
         # ========== PRED ========== #
         if RUN_PRED:
@@ -125,6 +129,8 @@ if __name__ == "__main__":
                 dict_data['pred_results_interpoalted'] = vals[11]
             except Exception as e:
                 print(f"[PRED] Error: {e}")
+                import traceback; traceback.print_exc()
+                import pdb; pdb.set_trace()
 
         # ========== SLOPE ========== #
         if RUN_SLOPE:
@@ -143,6 +149,8 @@ if __name__ == "__main__":
                                     }
             except Exception as e:
                 print(f"[SLOPE] Error: {e}")
+                import traceback; traceback.print_exc()
+                import pdb; pdb.set_trace()
 
         # ========== DFA ========== #
         if RUN_DFA:
@@ -163,6 +171,8 @@ if __name__ == "__main__":
 
                 except Exception as e:
                     print(f"[DFA {fband}] Error: {e}")
+                    import traceback; traceback.print_exc()
+                    import pdb; pdb.set_trace()
 
         # ========== AVC ========== #
         if RUN_AVC:
@@ -176,6 +186,8 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[AVC] Error: {e}")
+                import traceback; traceback.print_exc()
+                import pdb; pdb.set_trace()
 
         # ========== STD_DIST ========== #
         if RUN_STD_DIST:
@@ -188,7 +200,9 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[STD_DIST] Error: {e}")
-
+                import traceback; traceback.print_exc()
+                import pdb; pdb.set_trace()
+                
 
         # SAVE RESULTS
         update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
