@@ -69,7 +69,7 @@ if __name__ == "__main__":
         bad_indices = [channel_indices[ch] for ch in bad_chans]
         good_indices = [channel_indices[ch] for ch in good_chans]
 
-        path_raw = path.replace('_epo.fif', '_raw.fif').replace('10s', 'raw')
+        path_raw = path.replace('_epo.fif', '_raw.fif').replace('10s', 'raw').replace('03s', 'raw')
         raw_raw = mne.io.read_raw_fif(path_raw, preload=True)
         raw_32 = raw_raw.copy()
         raw_32.interpolate_bads(reset_bads=True).pick_types(eeg=True)
