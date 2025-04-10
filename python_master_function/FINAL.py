@@ -17,17 +17,17 @@ from features_AVC import features_AVC
 from features_avc_std_dist import features_avc_std_dist
 
 # ========== CONFIG ========== #
-MAX_TRIALS = 2
-MAX_S = 20
+MAX_TRIALS = 50
+MAX_S = 300
 
 # Flags to enable/disable analyses
-RUN_EOC = False
-RUN_EOS = False
-RUN_PRED = False
-RUN_SLOPE = False
-RUN_DFA = False
+RUN_EOC = True
+RUN_EOS = True
+RUN_PRED = True
+RUN_SLOPE = True
+RUN_DFA = True
 RUN_AVC = True
-RUN_STD_DIST = False
+RUN_STD_DIST = True
 
 
 if __name__ == "__main__":
