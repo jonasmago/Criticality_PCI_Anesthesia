@@ -188,4 +188,4 @@ if __name__ == "__main__":
 
 
         # SAVE RESULTS
-        update_results_table(path, row_data, dict_outputs=dict_data)
+        update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
