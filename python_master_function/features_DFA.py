@@ -20,15 +20,14 @@ from scipy.io import savemat
 # call:  python features_DFA.py -data_dir EPOCHS -output_dir RESULTS -part_info EPOCHS/participants.txt -lfrequ 8 -hfrequ 14
 
 def get_channel_hurst(ch_data,sfreq):
-    # scale = nk.expspace(1*sfreq, 20*sfreq, 40, base=2).astype(np.int64)
+    scale = nk.expspace(1*sfreq, 20*sfreq, 40, base=2).astype(np.int64)
     scale = nk.expspace(1*sfreq, 3*sfreq, 5, base=2).astype(np.int64)
 
     analytic_signal = hilbert(ch_data)
     amplitude_envelope = np.abs(analytic_signal)
 
     hurst_fh, _ = nk.fractal_hurst(amplitude_envelope, scale=scale, show=False)
-    import pdb; pdb.set_trace()
-    hurst_dfa, _ = nk.fractal_dfa(amplitude_envelope, scale=scale, show=True)
+    hurst_dfa, _ = nk.fractal_dfa(amplitude_envelope, scale=scale, show=False)
     print ('check3')
     print ('done one round of hurst')
     return  hurst_fh, hurst_dfa
