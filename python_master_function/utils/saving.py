@@ -23,7 +23,7 @@ def path_to_names(path):
 
 
 
-def update_results_table(path, row_dict, results_table_path, dict_outputs=None):
+def update_results_table(path, row_dict, results_table_path, results_dict_dir, dict_outputs=None):
     # Load or create table
     if os.path.exists(results_table_path):
         df = pd.read_csv(results_table_path)
