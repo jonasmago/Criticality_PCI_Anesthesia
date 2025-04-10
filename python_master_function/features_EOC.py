@@ -31,15 +31,11 @@ def fixed_chaos(trial, epochs, lpfrequency):
     fs = 256
     samples = data_trial.shape[1]
     nr_channels =  epochs.shape[1]
-    safe_len = min(1691, len(data_trial[0,:]) // 2)
-
 
     for ch in range(nr_channels):
         # select channel data
         data_ch = data_trial[ch,:]
-        ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=lpfrequency,
-                                             filter_length=str(safe_len),
-                                             verbose=False)
+        ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=lpfrequency,verbose=False)
         K_tmp = METHODS_chaos.chaos_pipeline(ch_filt)
         K_ch.append(K_tmp)
         hfreq.append(lpfrequency)
@@ -62,7 +58,6 @@ def filter_and_chaos(trial, epochs):
     data_trial = epochs[trial]
     fs = 256
     samples = data_trial.shape[1]
-    safe_len = min(1691, len(data_trial[0,:]) // 2)
 
     nr_channels =  epochs.shape[1]
     for ch in range(nr_channels):
@@ -88,9 +83,7 @@ def filter_and_chaos(trial, epochs):
             peak = fm.peak_params_[np.where(fm.peak_params_[:,0] == np.min(fm.peak_params_[:,0]))[0][0]]
             hfreq_tmp = peak[0] + 0.5*peak[2] #higher edge of lowest frequency
             #Filter data at chosen lowest frequency
-            ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=hfreq_tmp,
-                                             filter_length=str(safe_len),
-                                             verbose=False)
+            ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=hfreq_tmp,verbose=False)
             K_ch.append(METHODS_chaos.chaos_pipeline(ch_filt))
             hfreq.append(hfreq_tmp)
     print('Done Trial {}'.format(str(trial)))
@@ -111,7 +104,6 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
     epochs = mne_epochs.get_data()
     fs = 256
     samples = epochs[0].shape[1]
-    print('samples: {}'.format(samples))    
 
     # if data is too long only use the first 3 min of data
     nr_trials = min([len(epochs),max_trials]);
@@ -124,7 +116,7 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
         freq_range = [1, 6]
         data_con = np.concatenate(epochs,axis = 1)
         # get psd of channels
-        freqs, psds = signal.welch(data_con,fs,nperseg=samples)
+        freqs, psds = signal.welch(data_con,fs,nperseg=5*1024)
         psds =  np.mean(psds,axis = 0)
         fm.fit(freqs, psds, freq_range)
         if fm.peak_params_.shape[0] == 0:
