@@ -50,7 +50,7 @@ def update_results_table(path, row_dict, results_table_path, results_dict_dir, d
             if key not in df.columns:
                 df[key] = 'NA'
         df = pd.concat([df, pd.DataFrame([row_dict])], ignore_index=True)
-
+    import pdb; pdb.set_trace()
     df.to_csv(results_table_path, index=False)
 
     # Save detailed dictionary outputs

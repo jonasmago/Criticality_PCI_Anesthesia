@@ -18,6 +18,8 @@ from features_avc_std_dist import features_avc_std_dist
 
 import warnings
 warnings.filterwarnings('ignore', category=RuntimeWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
+
 
 # ========== CONFIG ========== #
 MAX_TRIALS = 600
