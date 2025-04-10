@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --account=def-michael9     # Replace with your actual account
 #SBATCH --job-name=eoc_dfa_run1       # Job name
-#SBATCH --time=08:00:00            # Max wall time (HH:MM:SS)
-#SBATCH --cpus-per-task=128          # Number of CPUs
-#SBATCH --mem=64G                  # Memory (adjust as needed)
+#SBATCH --time=10:00:00            # Max wall time (HH:MM:SS)
+#SBATCH --cpus-per-task=32          # Number of CPUs
+#SBATCH --mem=32G                  # Memory (adjust as needed)
 #SBATCH --output=logs/final_%j.out # Standard output (%j = job ID)
 #SBATCH --error=logs/final_%j.err  # Standard error
 #SBATCH --mail-user=jonas.h.mago@gmail.com  # Optional: email notifications
