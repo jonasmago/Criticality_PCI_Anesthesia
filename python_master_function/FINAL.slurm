@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --account=def-michael9     # Replace with your actual account
 #SBATCH --job-name=slurm_test       # Job name
-#SBATCH --time=00:10:00            # Max wall time (HH:MM:SS)
+#SBATCH --time=00:20:00            # Max wall time (HH:MM:SS)
 #SBATCH --cpus-per-task=32          # Number of CPUs
-#SBATCH --mem=16G                  # Memory (adjust as needed)
+#SBATCH --mem=32G                  # Memory (adjust as needed)
 #SBATCH --output=logs/final_%j.out # Standard output (%j = job ID)
 #SBATCH --error=logs/final_%j.err  # Standard error
 #SBATCH --mail-user=jonas.h.mago@gmail.com  # Optional: email notifications

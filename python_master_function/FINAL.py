@@ -17,8 +17,11 @@ from features_AVC import features_AVC
 from features_avc_std_dist import features_avc_std_dist
 
 # ========== CONFIG ========== #
-MAX_TRIALS = 50
-MAX_S = 300
+MAX_TRIALS = 600
+MAX_S = 1800
+
+MAX_TRIALS = 10
+MAX_S = 60
 
 # Flags to enable/disable analyses
 RUN_EOC = True
@@ -41,15 +44,15 @@ if __name__ == "__main__":
     name = args.name
 
     if device == 'l':
-        results_table_path = f'output/results_l{name}/summary.csv'
-        results_dict_dir = f'output/results_l{name}/details/'
+        results_table_path = f'output/results_l_{name}/summary.csv'
+        results_dict_dir = f'output/results_l_{name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
         paths = glob.glob('/Users/jonasmago/PhD_code_data/github/eeg_jhana/notebooks/hand_cleaning/ALL/10s/*.fif')
         paths.sort()
 
     if device == 'c':
-        results_table_path = f'output/results_c{name}/summary.csv'
-        results_dict_dir = f'output/results_c{name}/details/'
+        results_table_path = f'output/results_c_{name}/summary.csv'
+        results_dict_dir = f'output/results_c_{name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
         paths = glob.glob('/home/jmago/projects/def-michael9/jmago/jhana_eeg/data_test/03s/*.fif')
         paths.sort()
@@ -202,7 +205,7 @@ if __name__ == "__main__":
                 print(f"[STD_DIST] Error: {e}")
                 import traceback; traceback.print_exc()
                 import pdb; pdb.set_trace()
-                
+
 
         # SAVE RESULTS
         update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
