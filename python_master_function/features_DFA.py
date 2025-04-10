@@ -43,12 +43,13 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=200, bad_indices=None):
         data_filt = mne.filter.filter_data(data, sfreq=fs, l_freq=lfreq, h_freq=hfreq,verbose=False)
 
         input = []
+        results = []
         
-        # for ch in range(nr_channels):
-        #     # input.append((data_filt[ch,:],fs))
-        #     # get_channel_hurst(data_filt[ch,:],fs)
-        #     hurst_fh, hurst_dfa = get_channel_hurst(data_filt[ch, :], fs)
-        #     results.append((hurst_fh, hurst_dfa))
+        for ch in range(nr_channels):
+            # input.append((data_filt[ch,:],fs))
+            # get_channel_hurst(data_filt[ch,:],fs)
+            hurst_fh, hurst_dfa = get_channel_hurst(data_filt[ch, :], fs)
+            results.append((hurst_fh, hurst_dfa))
 
 
         # pool = mp.Pool(mp.cpu_count())
@@ -60,16 +61,14 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=200, bad_indices=None):
         # new multiprocessing
         #####
 
-        input = [(data_filt[ch, :], fs) for ch in range(nr_channels)]
-
-        # Create a Pool of workers
-        with mp.Pool(mp.cpu_count()) as pool:
-            results = pool.starmap(get_channel_hurst, input)  # Distribute the work across CPUs
+        # input = [(data_filt[ch, :], fs) for ch in range(nr_channels)]
+        # with mp.Pool(mp.cpu_count()) as pool:
+        #     results = pool.starmap(get_channel_hurst, input)  # Distribute the work across CPUs
 
 
 
 
-
+        print ('## one round done ##')
         results = np.array(results)
         results_interpolated = results.copy()
         results[bad_indices,:] = np.nan
