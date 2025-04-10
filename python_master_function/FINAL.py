@@ -1,3 +1,5 @@
+print("imports")
+
 import os
 import json
 import glob
@@ -114,8 +116,8 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[EOC] Error: {e}")
-                import traceback; traceback.print_exc()
-                import pdb; pdb.set_trace()
+                # import traceback; traceback.print_exc()
+                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== EOS ========== #
@@ -127,8 +129,8 @@ if __name__ == "__main__":
                 dict_data['eos_results'] = eos_results
             except Exception as e:
                 print(f"[EOS] Error: {e}")
-                import traceback; traceback.print_exc()
-                import pdb; pdb.set_trace()
+                # import traceback; traceback.print_exc()
+                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== PRED ========== #
@@ -142,8 +144,8 @@ if __name__ == "__main__":
                 dict_data['pred_results_interpoalted'] = vals[11]
             except Exception as e:
                 print(f"[PRED] Error: {e}")
-                import traceback; traceback.print_exc()
-                import pdb; pdb.set_trace()
+                # import traceback; traceback.print_exc()
+                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== SLOPE ========== #
@@ -164,8 +166,8 @@ if __name__ == "__main__":
                                     }
             except Exception as e:
                 print(f"[SLOPE] Error: {e}")
-                import traceback; traceback.print_exc()
-                import pdb; pdb.set_trace()
+                # import traceback; traceback.print_exc()
+                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== DFA ========== #
@@ -188,8 +190,8 @@ if __name__ == "__main__":
 
                 except Exception as e:
                     print(f"[DFA {fband}] Error: {e}")
-                    import traceback; traceback.print_exc()
-                    import pdb; pdb.set_trace()
+                    # import traceback; traceback.print_exc()
+                    # import pdb; pdb.set_trace()
                 update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== AVC ========== #
@@ -205,8 +207,8 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[AVC] Error: {e}")
-                import traceback; traceback.print_exc()
-                import pdb; pdb.set_trace()
+                # import traceback; traceback.print_exc()
+                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== STD_DIST ========== #
@@ -221,8 +223,8 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[STD_DIST] Error: {e}")
-                import traceback; traceback.print_exc()
-                import pdb; pdb.set_trace()
+                # import traceback; traceback.print_exc()
+                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
