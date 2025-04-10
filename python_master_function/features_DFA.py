@@ -27,6 +27,7 @@ def get_channel_hurst(ch_data,sfreq):
     amplitude_envelope = np.abs(analytic_signal)
 
     hurst_fh, _ = nk.fractal_hurst(amplitude_envelope, scale=scale, show=False)
+    import pdb; pdb.set_trace()
     hurst_dfa, _ = nk.fractal_dfa(amplitude_envelope, scale=scale, show=True)
     print ('check3')
     print ('done one round of hurst')
