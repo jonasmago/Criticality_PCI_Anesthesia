@@ -34,19 +34,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Calculate Edge of Synchrony using different methods')
     parser.add_argument('-device', type=str, action='store',
                         help='decide if this script runs local (l) or ona cluster (c)')
+    parser.add_argument('-name', type=str, action='store',
+                        help='name to specify output')
     args = parser.parse_args()
     device = args.device
+    name = args.name
 
     if device == 'l':
-        results_table_path = 'results_l/summary.csv'
-        results_dict_dir = 'results_l/details/'
+        results_table_path = f'results_l{name}/summary.csv'
+        results_dict_dir = f'results_l{name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
         paths = glob.glob('/Users/jonasmago/PhD_code_data/github/eeg_jhana/notebooks/hand_cleaning/ALL/10s/*.fif')
         paths.sort()
 
     if device == 'c':
-        results_table_path = 'results_c/summary.csv'
-        results_dict_dir = 'results_c/details/'
+        results_table_path = f'results_c{name}/summary.csv'
+        results_dict_dir = f'results_c{name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
         paths = glob.glob('/home/jmago/projects/def-michael9/jmago/jhana_eeg/data_test/03s/*.fif')
         paths.sort()
