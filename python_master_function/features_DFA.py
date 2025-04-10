@@ -28,8 +28,6 @@ def get_channel_hurst(ch_data,sfreq):
 
     hurst_fh, _ = nk.fractal_hurst(amplitude_envelope, scale=scale, show=False)
     hurst_dfa, _ = nk.fractal_dfa(amplitude_envelope, scale=scale, show=False)
-    print ('check3')
-    print ('done one round of hurst')
     return  hurst_fh, hurst_dfa
 
 
@@ -47,9 +45,9 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=200, bad_indices=None):
         input = []
         for ch in range(nr_channels):
             input.append((data_filt[ch,:],fs))
-            get_channel_hurst(data_filt[ch,:],fs)
+            # get_channel_hurst(data_filt[ch,:],fs)
 
-
+        import pdb; pdb.set_trace()
         pool = mp.Pool(mp.cpu_count())
         results = pool.starmap(get_channel_hurst,input)
         pool.close()
