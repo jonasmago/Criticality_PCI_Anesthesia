@@ -59,8 +59,11 @@ def update_results_table(path, row_dict, results_table_path, results_dict_dir, d
 
         # Load existing data if it exists
         if os.path.exists(pkl_path):
-            with open(pkl_path, 'rb') as f:
-                existing_data = pickle.load(f)
+            try: 
+                with open(pkl_path, 'rb') as f:
+                    existing_data = pickle.load(f)
+            except: 
+                existing_data = {}
         else:
             existing_data = {}
 
