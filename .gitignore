@@ -6,4 +6,5 @@ data/visualization/*
 venv/
 .Rproj.user
 python_master_function/output/
+python_master_function/logs/
 *__pycache__*
