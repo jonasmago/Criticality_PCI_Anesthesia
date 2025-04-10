@@ -28,7 +28,8 @@ def fixed_chaos(trial, epochs, lpfrequency):
 
     # select trial from epoch
     data_trial = epochs[trial]
-    fs = data_trial.shape[1]/10
+    fs = 256
+    samples = data_trial.shape[1]
     nr_channels =  epochs.shape[1]
 
     for ch in range(nr_channels):
@@ -66,7 +67,7 @@ def filter_and_chaos(trial, epochs):
         # Set the frequency range to fit the model
         freq_range = [1, 6]
         # get psd of channels
-        freqs, psd_ch = signal.welch(data_ch,fs,nperseg=10*256)
+        freqs, psd_ch = signal.welch(data_ch,fs,samples)
 
         fm.fit(freqs, psd_ch, freq_range)
 
