@@ -29,10 +29,10 @@ MAX_TRIALS = 10
 MAX_S = 60
 
 # Flags to enable/disable analyses
-RUN_EOC = True
-RUN_EOS = True
+RUN_EOC = False
+RUN_EOS = False
 RUN_PRED = False
-RUN_SLOPE = True
+RUN_SLOPE = False
 RUN_DFA = True
 RUN_AVC = True
 RUN_STD_DIST = True
