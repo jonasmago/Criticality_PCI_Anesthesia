@@ -22,11 +22,9 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 
 
 # ========== CONFIG ========== #
-MAX_TRIALS = 600
-MAX_S = 1800
+MAX_TRIALS = 200
+MAX_S = 2000
 
-MAX_TRIALS = 10
-MAX_S = 60
 
 # Flags to enable/disable analyses
 RUN_EOC = False
@@ -34,11 +32,12 @@ RUN_EOS = False
 RUN_PRED = False
 RUN_SLOPE = False
 RUN_DFA = True
-RUN_AVC = True
-RUN_STD_DIST = True
+RUN_AVC = False
+RUN_STD_DIST = False
 
 
 if __name__ == "__main__":
+    print("script started")
     parser = argparse.ArgumentParser(description='Calculate Edge of Synchrony using different methods')
     parser.add_argument('-device', type=str, action='store',
                         help='decide if this script runs local (l) or ona cluster (c)')
