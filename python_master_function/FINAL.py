@@ -29,7 +29,7 @@ MAX_S = 60
 # Flags to enable/disable analyses
 RUN_EOC = True
 RUN_EOS = True
-RUN_PRED = True
+RUN_PRED = False
 RUN_SLOPE = True
 RUN_DFA = True
 RUN_AVC = True
