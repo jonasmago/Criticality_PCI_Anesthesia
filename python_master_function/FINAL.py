@@ -106,6 +106,10 @@ if __name__ == "__main__":
                     'eoc_results': eoc_results,
                     'eoc_results_interpolated': eoc_results_interpolated
                 })
+
+                import traceback; traceback.print_exc()
+                import pdb; pdb.set_trace()
+
             except Exception as e:
                 print(f"[EOC] Error: {e}")
                 import traceback; traceback.print_exc()

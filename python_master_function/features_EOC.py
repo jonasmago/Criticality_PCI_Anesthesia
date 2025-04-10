@@ -166,8 +166,5 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
 
 
     pool.close()
-
-    import pdb; pdb.set_trace()
-
     return K_median, K_median_interpolated, Freq, Nopeak, results_array, results_array_interpolated
 
