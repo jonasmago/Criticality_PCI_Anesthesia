@@ -41,15 +41,15 @@ if __name__ == "__main__":
     name = args.name
 
     if device == 'l':
-        results_table_path = f'results_l{name}/summary.csv'
-        results_dict_dir = f'results_l{name}/details/'
+        results_table_path = f'output/results_l{name}/summary.csv'
+        results_dict_dir = f'output/results_l{name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
         paths = glob.glob('/Users/jonasmago/PhD_code_data/github/eeg_jhana/notebooks/hand_cleaning/ALL/10s/*.fif')
         paths.sort()
 
     if device == 'c':
-        results_table_path = f'results_c{name}/summary.csv'
-        results_dict_dir = f'results_c{name}/details/'
+        results_table_path = f'output/results_c{name}/summary.csv'
+        results_dict_dir = f'output/results_c{name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
         paths = glob.glob('/home/jmago/projects/def-michael9/jmago/jhana_eeg/data_test/03s/*.fif')
         paths.sort()
