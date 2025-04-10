@@ -44,26 +44,15 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=200, bad_indices=None):
 
         input = []
         for ch in range(nr_channels):
-            input.append((data_filt[ch,:],fs))
+            # input.append((data_filt[ch,:],fs))
             # get_channel_hurst(data_filt[ch,:],fs)
+            hurst_fh, hurst_dfa = get_channel_hurst(data_filt[ch, :], fs)
+            results.append((hurst_fh, hurst_dfa))
 
-        # import pdb; pdb.set_trace()
+
         # pool = mp.Pool(mp.cpu_count())
         # results = pool.starmap(get_channel_hurst,input)
         # pool.close()
-        
-        import pdb; pdb.set_trace()
-        pool = mp.Pool(mp.cpu_count())
-        async_results = []
-        for ch in range(nr_channels):
-            async_result = pool.apply_async(process_channel, (data_filt[ch, :], fs))
-            async_results.append(async_result)
-
-        results = [async_result.get() for async_result in async_results]
-        pool.close()
-        pool.join()
-        import pdb; pdb.set_trace()
-
         
         results = np.array(results)
         results_interpolated = results.copy()
