@@ -35,7 +35,7 @@ def fixed_chaos(trial, epochs, lpfrequency):
     for ch in range(nr_channels):
         # select channel data
         data_ch = data_trial[ch,:]
-        ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=lpfrequency,verbose=False)
+        ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=2, h_freq=lpfrequency,verbose=False)
         K_tmp = METHODS_chaos.chaos_pipeline(ch_filt)
         K_ch.append(K_tmp)
         hfreq.append(lpfrequency)
@@ -83,7 +83,7 @@ def filter_and_chaos(trial, epochs):
             peak = fm.peak_params_[np.where(fm.peak_params_[:,0] == np.min(fm.peak_params_[:,0]))[0][0]]
             hfreq_tmp = peak[0] + 0.5*peak[2] #higher edge of lowest frequency
             #Filter data at chosen lowest frequency
-            ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=hfreq_tmp,verbose=False)
+            ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=2, h_freq=hfreq_tmp,verbose=False)
             K_ch.append(METHODS_chaos.chaos_pipeline(ch_filt))
             hfreq.append(hfreq_tmp)
     print('Done Trial {}'.format(str(trial)))
