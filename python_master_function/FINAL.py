@@ -5,6 +5,7 @@ import pandas as pd
 import mne
 import numpy as np
 import pickle
+import argparse
 
 from utils.saving import update_results_table, path_to_names
 from features_EOC import features_EOC
@@ -16,13 +17,6 @@ from features_AVC import features_AVC
 from features_avc_std_dist import features_avc_std_dist
 
 # ========== CONFIG ========== #
-results_table_path = 'results/summary.csv'
-results_dict_dir = 'results/details/'
-os.makedirs(results_dict_dir, exist_ok=True)
-
-paths = glob.glob('/Users/jonasmago/PhD_code_data/github/eeg_jhana/notebooks/hand_cleaning/ALL/10s/*.fif')
-paths.sort()
-
 MAX_TRIALS = 2
 MAX_S = 20
 
@@ -37,6 +31,27 @@ RUN_STD_DIST = False
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Calculate Edge of Synchrony using different methods')
+    parser.add_argument('-device', type=str, action='store',
+                        help='decide if this script runs local (l) or ona cluster (c)')
+    args = parser.parse_args()
+    device = args.device
+
+    if device == 'l':
+        results_table_path = 'results_l/summary.csv'
+        results_dict_dir = 'results_l/details/'
+        os.makedirs(results_dict_dir, exist_ok=True)
+        paths = glob.glob('/Users/jonasmago/PhD_code_data/github/eeg_jhana/notebooks/hand_cleaning/ALL/10s/*.fif')
+        paths.sort()
+
+    if device == 'c':
+        results_table_path = 'results_c/summary.csv'
+        results_dict_dir = 'results_c/details/'
+        os.makedirs(results_dict_dir, exist_ok=True)
+        paths = glob.glob('/home/jmago/projects/def-michael9/jmago/jhana_eeg/data_test/10s/*.fif')
+        paths.sort()
+        print (paths)
+
     for path in paths:
         print(f"\n>>> Processing {os.path.basename(path)}")
         row_data, dict_data = {}, {}
