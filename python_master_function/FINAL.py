@@ -25,12 +25,12 @@ MAX_S = 60
 
 # Flags to enable/disable analyses
 RUN_EOC = True
-RUN_EOS = False
-RUN_PRED = False
-RUN_SLOPE = False
+RUN_EOS = True
+RUN_PRED = True
+RUN_SLOPE = True
 RUN_DFA = True
-RUN_AVC = False
-RUN_STD_DIST = False
+RUN_AVC = True
+RUN_STD_DIST = True
 
 
 if __name__ == "__main__":
@@ -107,13 +107,11 @@ if __name__ == "__main__":
                     'eoc_results_interpolated': eoc_results_interpolated
                 })
 
-                import traceback; traceback.print_exc()
-                import pdb; pdb.set_trace()
-
             except Exception as e:
                 print(f"[EOC] Error: {e}")
                 import traceback; traceback.print_exc()
                 import pdb; pdb.set_trace()
+            update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
 
         # ========== EOS ========== #
         if RUN_EOS:
@@ -125,6 +123,7 @@ if __name__ == "__main__":
                 print(f"[EOS] Error: {e}")
                 import traceback; traceback.print_exc()
                 import pdb; pdb.set_trace()
+            update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
 
         # ========== PRED ========== #
         if RUN_PRED:
@@ -138,6 +137,7 @@ if __name__ == "__main__":
                 print(f"[PRED] Error: {e}")
                 import traceback; traceback.print_exc()
                 import pdb; pdb.set_trace()
+            update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
 
         # ========== SLOPE ========== #
         if RUN_SLOPE:
@@ -158,6 +158,7 @@ if __name__ == "__main__":
                 print(f"[SLOPE] Error: {e}")
                 import traceback; traceback.print_exc()
                 import pdb; pdb.set_trace()
+            update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
 
         # ========== DFA ========== #
         if RUN_DFA:
@@ -180,6 +181,7 @@ if __name__ == "__main__":
                     print(f"[DFA {fband}] Error: {e}")
                     import traceback; traceback.print_exc()
                     import pdb; pdb.set_trace()
+                update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
 
         # ========== AVC ========== #
         if RUN_AVC:
@@ -195,6 +197,7 @@ if __name__ == "__main__":
                 print(f"[AVC] Error: {e}")
                 import traceback; traceback.print_exc()
                 import pdb; pdb.set_trace()
+            update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
 
         # ========== STD_DIST ========== #
         if RUN_STD_DIST:
@@ -209,6 +212,7 @@ if __name__ == "__main__":
                 print(f"[STD_DIST] Error: {e}")
                 import traceback; traceback.print_exc()
                 import pdb; pdb.set_trace()
+            update_results_table(path, row_data, results_table_path, dict_outputs=dict_data)
 
 
         # SAVE RESULTS
