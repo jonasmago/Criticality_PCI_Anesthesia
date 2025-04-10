@@ -56,7 +56,8 @@ def filter_and_chaos(trial, epochs):
 
     # select trial from epoch
     data_trial = epochs[trial]
-    fs = data_trial.shape[1]/10
+    fs = 256
+    samples = data_trial.shape[1]
 
     nr_channels =  epochs.shape[1]
     for ch in range(nr_channels):
