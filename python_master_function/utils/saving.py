@@ -74,4 +74,6 @@ def update_results_table(path, row_dict, results_table_path, results_dict_dir, d
         with open(pkl_path, 'wb') as f:
             pickle.dump(existing_data, f)
 
+    print('saving is done')
+
 

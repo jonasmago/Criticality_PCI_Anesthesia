@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
         # ========== EOC ========== #
         if RUN_EOC:
+            print (">>>>> processing EOC <<<<<")
             try:
                 K_median, K_median_interpolated, Freq, Nopeak, eoc_results, eoc_results_interpolated = features_EOC(
                     mne_epochs_32, k_type='flex', hfrequ=None, max_trials=MAX_TRIALS,
@@ -120,6 +121,7 @@ if __name__ == "__main__":
 
         # ========== EOS ========== #
         if RUN_EOS:
+            print (">>>>> processing EOS <<<<<")
             try:
                 PCF_mean, OR_mean, eos_results = features_EOS(mne_epochs_32, minfreq=1, maxfreq=10, fs=256, max_trials=MAX_TRIALS)
                 row_data.update({'PCF_mean': PCF_mean, 'OR_mean': OR_mean})
@@ -132,6 +134,7 @@ if __name__ == "__main__":
 
         # ========== PRED ========== #
         if RUN_PRED:
+            print (">>>>> processing PRED <<<<<")
             try:
                 vals = features_Pred(mne_epochs_32, lfreq=0.5, hfreq=40, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
                 names = ['Lyaps_max', 'Dims_mean', 'Ent_mean', 'LZC_mean', 'KDF_mean', 'Lyaps_max_interpolated', 'Dims_mean_interpolated', 'Ent_mean_interpolated', 'LZC_mean_interpolated', 'KDF_mean_interpolated']
@@ -146,6 +149,7 @@ if __name__ == "__main__":
 
         # ========== SLOPE ========== #
         if RUN_SLOPE:
+            print (">>>>> processing Slope <<<<<")
             try:
                 vals = features_slope(mne_epochs_32, lfreq=0.5, hfreq=40, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
                 row_data.update({
@@ -167,6 +171,7 @@ if __name__ == "__main__":
 
         # ========== DFA ========== #
         if RUN_DFA:
+            print (">>>>> processing DFA <<<<<")
             for fband in fbands:
                 try:
                     HURST_FH, HURST_DFA, results, HURST_FH_int, HURST_DFA_int, results_interpolated = features_DFA(
@@ -190,6 +195,7 @@ if __name__ == "__main__":
 
         # ========== AVC ========== #
         if RUN_AVC:
+            print (">>>>> processing AVC <<<<<")
             try:
                 out, avls = features_AVC(raw_32, bin_threshold=0.0005, max_iei=0.2, fs=256, max_s=MAX_S, lfreq=0.5, hfreq=40)
                 for key, value in out.items():
@@ -206,6 +212,7 @@ if __name__ == "__main__":
 
         # ========== STD_DIST ========== #
         if RUN_STD_DIST:
+            print (">>>>> processing std dist <<<<<")
             try:
                 part_hist_x, part_hist_y, part_hist_x_raw, part_hist_y_raw = features_avc_std_dist(raw_32, max_s=MAX_S, fs=256, lfreq=0.5, hfreq=40)
                 dict_data['part_hist_x'] = part_hist_x
