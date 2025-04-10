@@ -68,7 +68,7 @@ def filter_and_chaos(trial, epochs):
         # Set the frequency range to fit the model
         freq_range = [1, 6]
         # get psd of channels
-        freqs, psd_ch = signal.welch(data_ch,fs,samples)
+        freqs, psd_ch = signal.welch(data_ch,fs,nperseg=samples)
 
         fm.fit(freqs, psd_ch, freq_range)
 
@@ -103,7 +103,8 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
     mne_epochs.drop_channels(mne_epochs.info['bads'])
     epochs = mne_epochs.get_data()
     fs = 256
-    
+    samples = epochs[0].shape[1]
+    print('samples: {}'.format(samples))    
 
     # if data is too long only use the first 3 min of data
     nr_trials = min([len(epochs),max_trials]);
@@ -116,7 +117,7 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
         freq_range = [1, 6]
         data_con = np.concatenate(epochs,axis = 1)
         # get psd of channels
-        freqs, psds = signal.welch(data_con,fs,nperseg=5*1024)
+        freqs, psds = signal.welch(data_con,fs,nperseg=samples)
         psds =  np.mean(psds,axis = 0)
         fm.fit(freqs, psds, freq_range)
         if fm.peak_params_.shape[0] == 0:
