@@ -16,6 +16,9 @@ from features_DFA import features_DFA
 from features_AVC import features_AVC
 from features_avc_std_dist import features_avc_std_dist
 
+import warnings
+warnings.filterwarnings('ignore', category=RuntimeWarning)
+
 # ========== CONFIG ========== #
 MAX_TRIALS = 600
 MAX_S = 1800
@@ -47,7 +50,7 @@ if __name__ == "__main__":
         results_table_path = f'output/results_l_{name}/summary.csv'
         results_dict_dir = f'output/results_l_{name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
-        paths = glob.glob('/Users/jonasmago/PhD_code_data/github/eeg_jhana/notebooks/hand_cleaning/ALL/10s/*.fif')
+        paths = glob.glob('/Users/jonasmago/PhD_code_data/github/eeg_jhana/notebooks/hand_cleaning/ALL/03s/*.fif')
         paths.sort()
 
     if device == 'c':
@@ -65,8 +68,8 @@ if __name__ == "__main__":
         # Load Epoch + Raw
         mne_epochs_raw = mne.read_epochs(path, preload=True)
         mne_epochs_32 = mne_epochs_raw.copy()
-        mne_epochs_32.interpolate_bads(reset_bads=True).pick_types(eeg=True)
-        mne_epochs_raw.pick_types(eeg=True)
+        mne_epochs_32.interpolate_bads(reset_bads=True).pick('eeg')
+        mne_epochs_raw.pick('eeg')
 
         bad_chans = mne_epochs_raw.info['bads']
         all_chans = mne_epochs_32.ch_names
@@ -78,8 +81,8 @@ if __name__ == "__main__":
         path_raw = path.replace('_epo.fif', '_raw.fif').replace('10s', 'raw').replace('03s', 'raw')
         raw_raw = mne.io.read_raw_fif(path_raw, preload=True)
         raw_32 = raw_raw.copy()
-        raw_32.interpolate_bads(reset_bads=True).pick_types(eeg=True)
-        raw_raw.pick_types(eeg=True)
+        raw_32.interpolate_bads(reset_bads=True).pick('eeg')
+        raw_raw.pick('eeg')
 
         # Store metadata
         control, sub, day, condition, num_bad_channels, n_elem_raw, length_raw, n_epochs_10, length_10, n_epochs_3, length_3 = path_to_names(path)

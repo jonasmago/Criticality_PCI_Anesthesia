@@ -38,7 +38,6 @@ def get_pred(trial, epochs):
 
         dims, _ = nk.complexity_dimension(channel_data)
         Dims.append(dims)
-        print(dims)
 
         ent, _ = nk.entropy_multiscale(channel_data, show=False, dimension=dims)
         Ent.append(ent)

@@ -98,9 +98,7 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
     Nopeak = []
     K_median = []
     K_space = []
-
-    mne_epochs.pick_types(eeg=True)
-    mne_epochs.drop_channels(mne_epochs.info['bads'])
+    
     epochs = mne_epochs.get_data()
     fs = 256
     samples = epochs[0].shape[1]
