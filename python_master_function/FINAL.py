@@ -1,5 +1,3 @@
-print("imports")
-
 import os
 import json
 import glob
@@ -29,7 +27,7 @@ MAX_S = 2000
 
 
 # Flags to enable/disable analyses
-RUN_EOC = False
+RUN_EOC = True
 RUN_EOS = False
 RUN_PRED = False
 RUN_SLOPE = False
