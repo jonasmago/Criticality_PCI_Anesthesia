@@ -6,3 +6,4 @@ data/visualization/*
 venv/
 .Rproj.user
 python_master_function/results/
+python_master_function/output/
