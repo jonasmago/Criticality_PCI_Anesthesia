@@ -59,7 +59,7 @@ if __name__ == "__main__":
         results_table_path = f'output/results_c_{name}/summary.csv'
         results_dict_dir = f'output/results_c_{name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
-        paths = glob.glob('/home/jmago/projects/def-michael9/jmago/jhana_eeg/data_test/03s/*.fif')
+        paths = glob.glob('/home/jmago/projects/def-michael9/jmago/jhana_eeg/data/10s/*.fif')
         paths.sort()
         print (paths)
 
