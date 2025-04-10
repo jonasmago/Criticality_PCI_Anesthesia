@@ -66,15 +66,15 @@ def filter_and_chaos(trial, epochs):
         # Set the frequency range to fit the model
         freq_range = [1, 6]
         # get psd of channels
-        freqs, psd_ch = signal.welch(data_ch,fs,nperseg=5*1024)
+        freqs, psd_ch = signal.welch(data_ch,fs,nperseg=10*256)
 
         fm.fit(freqs, psd_ch, freq_range)
 
         if fm.peak_params_.shape[0] == 0:
             #no peak found, output nan
             failed.append(1)
-            hfreq.append( np.NaN )
-            K_ch.append( np.NaN )
+            hfreq.append( np.nan )
+            K_ch.append( np.nan )
         elif fm.peak_params_.shape[0] >= 1:
             failed.append(0)
             # select lowest frequency peak
