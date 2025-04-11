@@ -64,13 +64,28 @@ if __name__ == "__main__":
 
     for path in paths:
         print(f"\n>>> Processing {os.path.basename(path)}")
+        
+        # Store metadata
+        row_data, dict_data = {}, {}
+        control, sub, day, condition, num_bad_channels, n_elem_raw, length_raw, n_epochs_10, length_10, n_epochs_3, length_3 = path_to_names(path)
+        row_data.update({
+            'control': control, 'sub': sub, 'day': day, 'condition': condition,
+            'num_bad_channels': num_bad_channels, 'n_elem_raw': n_elem_raw,
+            'length_raw': length_raw, 'n_epochs_10': n_epochs_10, 'length_10': length_10,
+            'n_epochs_3': n_epochs_3, 'length_3': length_3
+        })
+
         row_data, dict_data = {}, {}
 
         # Load Epoch + Raw
         mne_epochs_raw = mne.read_epochs(path, preload=True)
         mne_epochs_32 = mne_epochs_raw.copy()
-        mne_epochs_32.interpolate_bads(reset_bads=True).pick('eeg')
         mne_epochs_raw.pick('eeg')
+        if len(mne_epochs_32) < 5 and len(mne_epochs_32.info['ch_names']) <  10:
+            update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+            continue
+
+        mne_epochs_32.interpolate_bads(reset_bads=True).pick('eeg')
 
         bad_chans = mne_epochs_raw.info['bads']
         all_chans = mne_epochs_32.ch_names
@@ -85,14 +100,9 @@ if __name__ == "__main__":
         raw_32.interpolate_bads(reset_bads=True).pick('eeg')
         raw_raw.pick('eeg')
 
-        # Store metadata
-        control, sub, day, condition, num_bad_channels, n_elem_raw, length_raw, n_epochs_10, length_10, n_epochs_3, length_3 = path_to_names(path)
-        row_data.update({
-            'control': control, 'sub': sub, 'day': day, 'condition': condition,
-            'num_bad_channels': num_bad_channels, 'n_elem_raw': n_elem_raw,
-            'length_raw': length_raw, 'n_epochs_10': n_epochs_10, 'length_10': length_10,
-            'n_epochs_3': n_epochs_3, 'length_3': length_3
-        })
+
+
+
 
         fbands = [[1, 45], [1, 4], [4, 8], [8, 13], [13, 30], [30, 45]]
 
