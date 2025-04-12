@@ -309,7 +309,7 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
 
 
         ctx = mp.get_context("spawn")
-        pool = ctx.Pool(mp.cpu_count())
+        pool = ctx.Pool(n_cpus)
         results = pool.starmap(get_channel_hurst,input)
         pool.close()
         pool.join()
@@ -439,7 +439,7 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
     #################################
 
     ctx = mp.get_context("spawn")
-    pool = ctx.Pool(mp.cpu_count())
+    pool = ctx.Pool(n_cpus)
     # loop over every time segment
 
     input = []
@@ -509,7 +509,7 @@ def features_EOS (mne_epochs, minfreq, maxfreq, fs, max_trials=30):
         ###############################################
 
         ctx = mp.get_context("spawn")
-        pool = ctx.Pool(mp.cpu_count())
+        pool = ctx.Pool(n_cpus)
         # loop over every time segment
 
         # prepare input for parallel function
@@ -518,7 +518,7 @@ def features_EOS (mne_epochs, minfreq, maxfreq, fs, max_trials=30):
             input.append((trial,epochs_filt))
        
         ctx = mp.get_context("spawn")
-        pool = ctx.Pool(mp.cpu_count())
+        pool = ctx.Pool(n_cpus)
         results = pool.starmap(calculate_values,input)
         pool.close()
         pool.join()
@@ -582,7 +582,7 @@ def features_Pred (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices 
     #################################
 
     ctx = mp.get_context("spawn")
-    pool = ctx.Pool(mp.cpu_count())
+    pool = ctx.Pool(n_cpus)
 
     # loop over every time segment
     input = []
@@ -926,7 +926,9 @@ def update_results_table(path, row_dict, results_table_path, results_dict_dir, d
 
 if __name__ == "__main__":
     print("script started")
-    print(f"Using {mp.cpu_count()} CPUs")
+    n_cpus = int(os.environ.get("SLURM_CPUS_PER_TASK", 1))
+    print(f"Using {n_cpus} CPUs from SLURM allocation")
+
 
     parser = argparse.ArgumentParser(description='Calculate Edge of Synchrony using different methods')
     parser.add_argument('-device', type=str, action='store',
@@ -950,7 +952,7 @@ if __name__ == "__main__":
         os.makedirs(results_dict_dir, exist_ok=True)
         paths = glob.glob('/home/jmago/projects/def-michael9/jmago/jhana_eeg/data/10s/*.fif')
         paths.sort()
-        print (paths)
+        # print (paths)
 
     start = 0
     for path_i_relative, path in enumerate(paths[start:]):
