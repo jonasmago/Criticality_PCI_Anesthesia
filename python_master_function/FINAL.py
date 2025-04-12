@@ -186,7 +186,6 @@ if __name__ == "__main__":
                 try:
                     HURST_FH, HURST_DFA, results, HURST_FH_int, HURST_DFA_int, results_interpolated = features_DFA(
                         raw_32, lfreq=fband[0], hfreq=fband[1], fs=256, max_s=MAX_S, bad_indices=bad_indices)
-                    import pdb; pdb.set_trace()
                     band_name = f"{fband[0]}-{fband[1]}Hz"
                     row_data[f'HURST_FH_{band_name}'] = HURST_FH
                     row_data[f'HURST_DFA_{band_name}'] = HURST_DFA
