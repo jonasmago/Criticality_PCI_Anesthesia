@@ -27,7 +27,7 @@ MAX_S = 2000
 
 
 # Flags to enable/disable analyses
-RUN_EOC = True
+RUN_EOC = False
 RUN_EOS = False
 RUN_PRED = False
 RUN_SLOPE = False
@@ -81,7 +81,8 @@ if __name__ == "__main__":
         mne_epochs_raw = mne.read_epochs(path, preload=True)
         mne_epochs_32 = mne_epochs_raw.copy()
         mne_epochs_raw.pick('eeg')
-        if len(mne_epochs_32) < 5 and len(mne_epochs_32.info['ch_names']) <  10:
+
+        if len(mne_epochs_32) < 5 or len(mne_epochs_32.info['ch_names']) <  10:
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
             continue
 
