@@ -31,12 +31,13 @@ def get_channel_hurst(ch_data,sfreq):
     return  hurst_fh, hurst_dfa
 
 
-def features_DFA(raw, lfreq, hfreq, fs=256, max_s=200, bad_indices=None):
+def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
+        
         data = raw.get_data()
         nr_channels =  data.shape[0]
 
         # cut data and only use first 200s or less
-        sig_length = min(data.shape[1]/fs , 200)
+        sig_length = min(data.shape[1]/fs , max_s)
         cut = int(sig_length*fs)
         data = data[:,:cut]
 
@@ -78,4 +79,5 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=200, bad_indices=None):
         HURST_FH_interpolated = np.mean(results_interpolated[:,0])
         HURST_DFA_interpolated = np.mean((results_interpolated)[:,1])
 
+        
         return HURST_FH, HURST_DFA, results, HURST_FH_interpolated, HURST_DFA_interpolated, results_interpolated
