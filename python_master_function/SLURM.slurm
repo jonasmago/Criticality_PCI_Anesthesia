@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --account=def-michael9     # Replace with your actual account
-#SBATCH --job-name=all_8h          # Job name
+#SBATCH --job-name=big_all_01          # Job name
 #SBATCH --time=08:00:00            # Max wall time (HH:MM:SS)
-#SBATCH --cpus-per-task=32          # Number of CPUs
-#SBATCH --mem=32G                  # Memory (adjust as needed)
+#SBATCH --cpus-per-task=40         # Number of CPUs
+#SBATCH --mem=192G                 # Memory (adjust as needed)
 #SBATCH --output=logs/final_%j.out # Standard output (%j = job ID)
 #SBATCH --error=logs/final_%j.err  # Standard error
 #SBATCH --mail-user=jonas.h.mago@gmail.com  # Optional: email notifications
@@ -18,4 +18,4 @@ module load python/3.10
 source ../../../venv/bin/activate 
 
 # Run the Python script
-python FINAL.py -device c -name all_8h
+python FINAL.py -device c -name big_all_01
