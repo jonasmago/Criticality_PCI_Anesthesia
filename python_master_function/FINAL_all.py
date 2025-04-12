@@ -45,6 +45,9 @@ np.int = int
 MAX_TRIALS = 200
 MAX_S = 2000
 
+MAX_TRIALS = 20
+MAX_S = 200
+
 
 # Flags to enable/disable analyses
 # RUN_EOC = False
