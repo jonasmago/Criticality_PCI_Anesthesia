@@ -26,7 +26,7 @@ import neurokit2 as nk
 from fooof import FOOOF
 from antropy import lziv_complexity
 from sklearn import *
-
+import edgeofpy as eop
 
 # from utils.saving import update_results_table, path_to_names
 # from features_EOC import features_EOC
@@ -544,7 +544,6 @@ def get_pred(trial, epochs):
     trial_data = epochs[trial]
 
     for ch in range(nr_channels):
-        print (ch)
         channel_data = trial_data[ch]
         lle, _ = nk.complexity_lyapunov(channel_data, method="rosenstein1993", show=False)
         Lyaps.append(lle)
