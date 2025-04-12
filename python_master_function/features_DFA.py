@@ -26,10 +26,17 @@ def get_channel_hurst(ch_data,sfreq):
     analytic_signal = hilbert(ch_data)
     amplitude_envelope = np.abs(analytic_signal)
 
-    hurst_fh, _ = nk.fractal_hurst(amplitude_envelope, scale=scale, show=False)
-    hurst_dfa, _ = nk.fractal_dfa(amplitude_envelope, scale=scale, show=False)
-    return  hurst_fh, hurst_dfa
+    try:
+        hurst_fh, _ =   nk.fractal_hurst(amplitude_envelope, scale=scale, show=False)
+    except:
+        hurst_fh = np.nan
 
+    try:
+        hurst_dfa, _ = nk.fractal_dfa(amplitude_envelope, scale=scale, show=False)
+    except:
+        hurst_dfa = np.nan
+
+    return hurst_fh, hurst_dfa
 
 def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
         
