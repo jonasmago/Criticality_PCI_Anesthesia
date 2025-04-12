@@ -16,4 +16,4 @@ module load python/3.10
 source ../../../venv/bin/activate 
 
 # Run the Python script
-python FINAL.py -device c -name eoc_dfa_run1
+python FINAL.py -device c -name dfa_30m
