@@ -27,13 +27,13 @@ MAX_S = 2000
 
 
 # Flags to enable/disable analyses
-RUN_EOC = False
-RUN_EOS = False
-RUN_PRED = False
-RUN_SLOPE = False
-RUN_DFA = True
-RUN_AVC = False
-RUN_STD_DIST = False
+# RUN_EOC = False
+# RUN_EOS = False
+# RUN_PRED = False
+# RUN_SLOPE = False
+# RUN_DFA = True
+# RUN_AVC = False
+# RUN_STD_DIST = False
 
 
 RUN_EOC = True
@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
 
 
-        fbands = [[30, 45], [1, 45], [1, 4], [4, 8], [8, 13], [13, 30], [30, 45]]
+        fbands = [[1, 45], [1, 4], [4, 8], [8, 13], [13, 30], [30, 45]]
 
         # ========== EOC ========== #
         if RUN_EOC:
