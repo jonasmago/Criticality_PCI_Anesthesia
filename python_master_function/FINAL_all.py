@@ -340,7 +340,7 @@ def fixed_chaos(trial, epochs, lpfrequency):
         # select channel data
         data_ch = data_trial[ch,:]
         ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=lpfrequency,verbose=False)
-        K_tmp = METHODS_chaos.chaos_pipeline(ch_filt)
+        K_tmp = chaos_pipeline(ch_filt)
         K_ch.append(K_tmp)
         hfreq.append(lpfrequency)
         if type(K_tmp) != np.nan:
@@ -388,7 +388,7 @@ def filter_and_chaos(trial, epochs):
             hfreq_tmp = peak[0] + 0.5*peak[2] #higher edge of lowest frequency
             #Filter data at chosen lowest frequency
             ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=hfreq_tmp,verbose=False)
-            K_ch.append(METHODS_chaos.chaos_pipeline(ch_filt))
+            K_ch.append(chaos_pipeline(ch_filt))
             hfreq.append(hfreq_tmp)
     print('Done Trial {}'.format(str(trial)))
 
@@ -482,7 +482,7 @@ def calculate_values(trial, epochs):
 
     #PLE = Methods_EOS.ple(data_tr, m = 5, tau = 2)
     #PLI = Methods_EOS.pli(data_tr)
-    PCF, OR_mean, orph_vector_tr, orpa_vector_tr = METHODS_EOS.pcf(data_tr)
+    PCF, OR_mean, orph_vector_tr, orpa_vector_tr = pcf(data_tr)
     print(f'done Trial {str(trial)}')
 
     #return PLI, PLE, PCF, OR_mean, OR_var
