@@ -18,4 +18,4 @@ module load python/3.10
 source ../../../venv/bin/activate 
 
 # Run the Python script
-python FINAL.py -device c -name big_all_01
+python FINAL_all.py -device c -name big_all_01
