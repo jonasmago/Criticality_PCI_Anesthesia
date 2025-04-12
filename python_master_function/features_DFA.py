@@ -30,6 +30,7 @@ def get_channel_hurst(ch_data,sfreq):
         hurst_fh, _ =   nk.fractal_hurst(amplitude_envelope, scale=scale, show=False)
     except:
         hurst_fh = np.nan
+        import pdb; pdb.set_trace()
 
     try:
         hurst_dfa, _ = nk.fractal_dfa(amplitude_envelope, scale=scale, show=False)
