@@ -7,10 +7,12 @@ import pickle
 import random
 import sys
 import glob
+import time
 
 # ====== Scientific Python ======
 import numpy as np
 import pandas as pd
+import scipy
 from scipy import signal, stats
 from scipy.fft import fft, ifft
 from scipy.fftpack import rfft, irfft
@@ -952,9 +954,10 @@ if __name__ == "__main__":
 
     start = 0
     for path_i_relative, path in enumerate(paths[start:]):
+
         path_i = path_i_relative+start
-   
         print(f"\n>>> Processing {os.path.basename(path)}")
+        t_start = time.time()
         
         # Store metadata
         row_data, dict_data = {}, {}
@@ -1040,7 +1043,7 @@ if __name__ == "__main__":
                 names = ['Lyaps_max', 'Dims_mean', 'Ent_mean', 'LZC_mean', 'KDF_mean', 'Lyaps_max_interpolated', 'Dims_mean_interpolated', 'Ent_mean_interpolated', 'LZC_mean_interpolated', 'KDF_mean_interpolated']
                 row_data.update({name: val for name, val in zip(names, vals[:10])})
                 dict_data['pred_results'] = vals[10]
-                dict_data['pred_results_interpoalted'] = vals[11]
+                dict_data['pred_results_interpolated'] = vals[11]
             except Exception as e:
                 print(f"[PRED] Error: {e}")
                 # import traceback; traceback.print_exc()
@@ -1128,3 +1131,5 @@ if __name__ == "__main__":
 
         # SAVE RESULTS
         update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+    print(f"⏱️ Elapsed time for file: {time.time() - t_start:.2f} seconds")
+
