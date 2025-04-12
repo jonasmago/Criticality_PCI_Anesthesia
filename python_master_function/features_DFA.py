@@ -30,7 +30,6 @@ def get_channel_hurst(ch_data,sfreq):
         hurst_fh, _ =   nk.fractal_hurst(amplitude_envelope, scale=scale, show=False)
     except:
         hurst_fh = np.nan
-        import pdb; pdb.set_trace()
 
     try:
         hurst_dfa, _ = nk.fractal_dfa(amplitude_envelope, scale=scale, show=False)
@@ -56,26 +55,15 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
         
         for ch in range(nr_channels):
             # input.append((data_filt[ch,:],fs))
-            # get_channel_hurst(data_filt[ch,:],fs)
-            hurst_fh, hurst_dfa = get_channel_hurst(data_filt[ch, :], fs)
-            results.append((hurst_fh, hurst_dfa))
+            
+            # hurst_fh, hurst_dfa = get_channel_hurst(data_filt[ch, :], fs)
+            # results.append((hurst_fh, hurst_dfa))
 
 
-        # pool = mp.Pool(mp.cpu_count())
-        # results = pool.starmap(get_channel_hurst,input)
-        # pool.close()
+        pool = mp.Pool(mp.cpu_count())
+        results = pool.starmap(get_channel_hurst,input)
+        pool.close()
         
-
-        ####
-        # new multiprocessing
-        #####
-
-        # input = [(data_filt[ch, :], fs) for ch in range(nr_channels)]
-        # with mp.Pool(mp.cpu_count()) as pool:
-        #     results = pool.starmap(get_channel_hurst, input)  # Distribute the work across CPUs
-
-
-
 
         print ('## one round done ##')
         results = np.array(results)
