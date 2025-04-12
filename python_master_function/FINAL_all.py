@@ -11,6 +11,9 @@ import time
 
 # ====== Scientific Python ======
 import numpy as np
+from numpy import (absolute, angle, arctan2,
+                   diff, exp, imag, mean, real, square,
+                   var)
 import pandas as pd
 import scipy
 from scipy import signal, stats
