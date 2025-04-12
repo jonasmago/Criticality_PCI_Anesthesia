@@ -62,13 +62,17 @@ if __name__ == "__main__":
         paths.sort()
         print (paths)
 
-    for path in paths:
+    start = 0
+    for path_i_relative, path in enumerate(paths[start:]):
+        path_i = path_i_relative+start
+   
         print(f"\n>>> Processing {os.path.basename(path)}")
         
         # Store metadata
         row_data, dict_data = {}, {}
         control, sub, day, condition, num_bad_channels, n_elem_raw, length_raw, n_epochs_10, length_10, n_epochs_3, length_3 = path_to_names(path)
         row_data.update({
+            'path_i': path_i_total,
             'control': control, 'sub': sub, 'day': day, 'condition': condition,
             'num_bad_channels': num_bad_channels, 'n_elem_raw': n_elem_raw,
             'length_raw': length_raw, 'n_epochs_10': n_epochs_10, 'length_10': length_10,

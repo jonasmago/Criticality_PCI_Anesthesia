@@ -38,42 +38,75 @@ def get_channel_hurst(ch_data,sfreq):
 
     return hurst_fh, hurst_dfa
 
-def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
+# def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
         
-        data = raw.get_data()
-        nr_channels =  data.shape[0]
+#         data = raw.get_data()
+#         nr_channels =  data.shape[0]
 
-        # cut data and only use first 200s or less
-        sig_length = min(data.shape[1]/fs , max_s)
-        cut = int(sig_length*fs)
-        data = data[:,:cut]
+#         # cut data and only use first 200s or less
+#         sig_length = min(data.shape[1]/fs , max_s)
+#         cut = int(sig_length*fs)
+#         data = data[:,:cut]
 
-        data_filt = mne.filter.filter_data(data, sfreq=fs, l_freq=lfreq, h_freq=hfreq,verbose=False)
+#         data_filt = mne.filter.filter_data(data, sfreq=fs, l_freq=lfreq, h_freq=hfreq,verbose=False)
 
-        input = []
-        results = []
+#         input = []
+#         results = []
         
-        for ch in range(nr_channels):
-            input.append((data_filt[ch,:],fs))
+#         for ch in range(nr_channels):
+#             input.append((data_filt[ch,:],fs))
             
-            # hurst_fh, hurst_dfa = get_channel_hurst(data_filt[ch, :], fs)
-            # results.append((hurst_fh, hurst_dfa))
+#             # hurst_fh, hurst_dfa = get_channel_hurst(data_filt[ch, :], fs)
+#             # results.append((hurst_fh, hurst_dfa))
 
 
-        pool = mp.Pool(mp.cpu_count())
-        results = pool.starmap(get_channel_hurst,input)
-        pool.close()
+#         pool = mp.Pool(mp.cpu_count())
+#         results = pool.starmap(get_channel_hurst,input)
+#         pool.close()
         
 
-        print ('## one round done ##')
-        results = np.array(results)
-        results_interpolated = results.copy()
-        results[bad_indices,:] = np.nan
+#         print ('## one round done ##')
+#         results = np.array(results)
+#         results_interpolated = results.copy()
+#         results[bad_indices,:] = np.nan
 
-        HURST_FH = np.nanmean(results[:,0])
-        HURST_DFA = np.nanmean((results)[:,1])
-        HURST_FH_interpolated = np.mean(results_interpolated[:,0])
-        HURST_DFA_interpolated = np.mean((results_interpolated)[:,1])
+#         HURST_FH = np.nanmean(results[:,0])
+#         HURST_DFA = np.nanmean((results)[:,1])
+#         HURST_FH_interpolated = np.mean(results_interpolated[:,0])
+#         HURST_DFA_interpolated = np.mean((results_interpolated)[:,1])
 
         
-        return HURST_FH, HURST_DFA, results, HURST_FH_interpolated, HURST_DFA_interpolated, results_interpolated
+#         return HURST_FH, HURST_DFA, results, HURST_FH_interpolated, HURST_DFA_interpolated, results_interpolated
+
+
+def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
+    data = raw.get_data()
+    nr_channels = data.shape[0]
+
+    # Cut data and only use first 200s or less
+    sig_length = min(data.shape[1] / fs, max_s)
+    cut = int(sig_length * fs)
+    data = data[:, :cut]
+
+    data_filt = mne.filter.filter_data(data, sfreq=fs, l_freq=lfreq, h_freq=hfreq, verbose=False)
+
+    input_data = [(data_filt[ch, :], fs) for ch in range(nr_channels)]
+
+    # ✅ Safe multiprocessing: wrap the pool in a helper function
+    def run_parallel(input_data):
+        with mp.Pool(mp.cpu_count()) as pool:
+            return pool.starmap(get_channel_hurst, input_data)
+
+    results = run_parallel(input_data)
+
+    print('## one round done ##')
+    results = np.array(results)
+    results_interpolated = results.copy()
+    results[bad_indices, :] = np.nan
+
+    HURST_FH = np.nanmean(results[:, 0])
+    HURST_DFA = np.nanmean(results[:, 1])
+    HURST_FH_interpolated = np.mean(results_interpolated[:, 0])
+    HURST_DFA_interpolated = np.mean(results_interpolated[:, 1])
+
+    return HURST_FH, HURST_DFA, results, HURST_FH_interpolated, HURST_DFA_interpolated, results_interpolated
