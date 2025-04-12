@@ -183,24 +183,24 @@ if __name__ == "__main__":
         if RUN_DFA:
             print (">>>>> processing DFA <<<<<")
             for fband in fbands:
-                # try:
-                HURST_FH, HURST_DFA, results, HURST_FH_int, HURST_DFA_int, results_interpolated = features_DFA(
-                    raw_32, lfreq=fband[0], hfreq=fband[1], fs=256, max_s=MAX_S, bad_indices=bad_indices)
-                band_name = f"{fband[0]}-{fband[1]}Hz"
-                row_data[f'HURST_FH_{band_name}'] = HURST_FH
-                row_data[f'HURST_DFA_{band_name}'] = HURST_DFA
-                row_data[f'HURST_FH_interpolated_{band_name}'] = HURST_FH_int
-                row_data[f'HURST_DFA_interpolated_{band_name}'] = HURST_DFA_int
+                try:
+                    HURST_FH, HURST_DFA, results, HURST_FH_int, HURST_DFA_int, results_interpolated = features_DFA(
+                        raw_32, lfreq=fband[0], hfreq=fband[1], fs=256, max_s=MAX_S, bad_indices=bad_indices)
+                    band_name = f"{fband[0]}-{fband[1]}Hz"
+                    row_data[f'HURST_FH_{band_name}'] = HURST_FH
+                    row_data[f'HURST_DFA_{band_name}'] = HURST_DFA
+                    row_data[f'HURST_FH_interpolated_{band_name}'] = HURST_FH_int
+                    row_data[f'HURST_DFA_interpolated_{band_name}'] = HURST_DFA_int
 
-                dict_data[f'results_DFA_{band_name}'] = results
-                dict_data[f'results_DFA_int_{band_name}'] = results_interpolated
+                    dict_data[f'results_DFA_{band_name}'] = results
+                    dict_data[f'results_DFA_int_{band_name}'] = results_interpolated
 
 
-                # except Exception as e:
-                #     print(f"[DFA {fband}] Error: {e}")
-                #     # import traceback; traceback.print_exc()
-                #     # import pdb; pdb.set_trace()
-                # update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+                except Exception as e:
+                    print(f"[DFA {fband}] Error: {e}")
+                    # import traceback; traceback.print_exc()
+                    # import pdb; pdb.set_trace()
+                update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== AVC ========== #
         if RUN_AVC:
