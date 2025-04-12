@@ -306,6 +306,8 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
         pool = mp.Pool(mp.cpu_count())
         results = pool.starmap(get_channel_hurst,input)
         pool.close()
+        pool.join()
+
         
 
         print ('## one round done ##')
@@ -465,6 +467,8 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
 
 
     pool.close()
+    pool.join()
+
     return K_median, K_median_interpolated, Freq, Nopeak, results_array, results_array_interpolated
 
 
@@ -508,6 +512,8 @@ def features_EOS (mne_epochs, minfreq, maxfreq, fs, max_trials=30):
         pool = mp.Pool(mp.cpu_count())
         results = pool.starmap(calculate_values,input)
         pool.close()
+        pool.join()
+
 
         
 
@@ -593,6 +599,8 @@ def features_Pred (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices 
     KDF_mean_int = (np.nanmean(results_int[:,4,:],axis = (0,1)))
 
     pool.close()
+    pool.join()
+
     
     return Lyaps_max, Dims_mean, Ent_mean, LZC_mean, KDF_mean, Lyaps_max_int, Dims_mean_int, Ent_mean_int, LZC_mean_int, KDF_mean_int, results, results_int 
 
@@ -942,6 +950,8 @@ def update_results_table(path, row_dict, results_table_path, results_dict_dir, d
 
 if __name__ == "__main__":
     print("script started")
+    print(f"Using {mp.cpu_count()} CPUs")
+
     parser = argparse.ArgumentParser(description='Calculate Edge of Synchrony using different methods')
     parser.add_argument('-device', type=str, action='store',
                         help='decide if this script runs local (l) or ona cluster (c)')
