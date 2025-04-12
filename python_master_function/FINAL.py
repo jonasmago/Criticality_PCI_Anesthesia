@@ -36,6 +36,14 @@ RUN_AVC = False
 RUN_STD_DIST = False
 
 
+RUN_EOC = True
+RUN_EOS = True
+RUN_PRED = True
+RUN_SLOPE = True
+RUN_DFA = True
+RUN_AVC = True
+RUN_STD_DIST = True
+
 if __name__ == "__main__":
     print("script started")
     parser = argparse.ArgumentParser(description='Calculate Edge of Synchrony using different methods')
