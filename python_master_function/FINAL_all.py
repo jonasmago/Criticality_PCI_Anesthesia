@@ -303,7 +303,8 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
             # results.append((hurst_fh, hurst_dfa))
 
 
-        pool = mp.Pool(mp.cpu_count())
+        ctx = mp.get_context("spawn")
+        pool = ctx.Pool(mp.cpu_count())
         results = pool.starmap(get_channel_hurst,input)
         pool.close()
         pool.join()
@@ -432,7 +433,8 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
     #    Calculate 01chaos test     #
     #################################
 
-    pool = mp.Pool(mp.cpu_count())
+    ctx = mp.get_context("spawn")
+    pool = ctx.Pool(mp.cpu_count())
     # loop over every time segment
 
     input = []
@@ -501,15 +503,17 @@ def features_EOS (mne_epochs, minfreq, maxfreq, fs, max_trials=30):
         #    Calculate Pair Correlation Function     #
         ###############################################
 
-        pool = mp.Pool(mp.cpu_count())
+        ctx = mp.get_context("spawn")
+        pool = ctx.Pool(mp.cpu_count())
         # loop over every time segment
 
         # prepare input for parallel function
         input = []
         for trial in range(nr_trials):
             input.append((trial,epochs_filt))
-
-        pool = mp.Pool(mp.cpu_count())
+       
+        ctx = mp.get_context("spawn")
+        pool = ctx.Pool(mp.cpu_count())
         results = pool.starmap(calculate_values,input)
         pool.close()
         pool.join()
@@ -572,7 +576,8 @@ def features_Pred (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices 
     #    Calculate LZC             #
     #################################
 
-    pool = mp.Pool(mp.cpu_count())
+    ctx = mp.get_context("spawn")
+    pool = ctx.Pool(mp.cpu_count())
 
     # loop over every time segment
     input = []
@@ -912,40 +917,6 @@ def update_results_table(path, row_dict, results_table_path, results_dict_dir, d
 
 ###################################################
 ###################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
