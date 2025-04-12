@@ -78,4 +78,5 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=200, bad_indices=None):
         HURST_FH_interpolated = np.mean(results_interpolated[:,0])
         HURST_DFA_interpolated = np.mean((results_interpolated)[:,1])
 
+        import pdb; pdb.set_trace()
         return HURST_FH, HURST_DFA, results, HURST_FH_interpolated, HURST_DFA_interpolated, results_interpolated

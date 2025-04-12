@@ -8,6 +8,7 @@
 #SBATCH --error=logs/final_%j.err  # Standard error
 #SBATCH --mail-user=jonas.h.mago@gmail.com  # Optional: email notifications
 #SBATCH --mail-type=ALL           # Email on (FIAL, ALL, BEGIN, END)
+#SBATCH --nice=1000
 
 cd /home/jmago/projects/def-michael9/jmago/jhana_eeg/Criticality_PCI_Anesthesia/python_master_function
 
