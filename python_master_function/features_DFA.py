@@ -54,7 +54,7 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
         results = []
         
         for ch in range(nr_channels):
-            # input.append((data_filt[ch,:],fs))
+            input.append((data_filt[ch,:],fs))
             
             # hurst_fh, hurst_dfa = get_channel_hurst(data_filt[ch, :], fs)
             # results.append((hurst_fh, hurst_dfa))

@@ -75,8 +75,6 @@ if __name__ == "__main__":
             'n_epochs_3': n_epochs_3, 'length_3': length_3
         })
 
-        row_data, dict_data = {}, {}
-
         # Load Epoch + Raw
         mne_epochs_raw = mne.read_epochs(path, preload=True)
         mne_epochs_32 = mne_epochs_raw.copy()
