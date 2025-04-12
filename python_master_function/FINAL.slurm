@@ -1,14 +1,15 @@
 #!/bin/bash
 #SBATCH --account=def-michael9     # Replace with your actual account
-#SBATCH --job-name=eoc_dfa_run1       # Job name
-#SBATCH --time=00:30:00            # Max wall time (HH:MM:SS)
+#SBATCH --job-name=all_8h          # Job name
+#SBATCH --time=08:00:00            # Max wall time (HH:MM:SS)
 #SBATCH --cpus-per-task=32          # Number of CPUs
 #SBATCH --mem=32G                  # Memory (adjust as needed)
 #SBATCH --output=logs/final_%j.out # Standard output (%j = job ID)
 #SBATCH --error=logs/final_%j.err  # Standard error
 #SBATCH --mail-user=jonas.h.mago@gmail.com  # Optional: email notifications
 #SBATCH --mail-type=ALL           # Email on (FIAL, ALL, BEGIN, END)
-#SBATCH --nice=1000
+
+# #SBATCH --nice=1000
 
 cd /home/jmago/projects/def-michael9/jmago/jhana_eeg/Criticality_PCI_Anesthesia/python_master_function
 
@@ -17,4 +18,4 @@ module load python/3.10
 source ../../../venv/bin/activate 
 
 # Run the Python script
-python FINAL.py -device c -name dfa_30m_2
+python FINAL.py -device c -name all_8h
