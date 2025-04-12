@@ -32,6 +32,7 @@ def get_pred(trial, epochs):
     trial_data = epochs[trial]
 
     for ch in range(nr_channels):
+        print (ch)
         channel_data = trial_data[ch]
         lle, _ = nk.complexity_lyapunov(channel_data, method="rosenstein1993", show=False)
         Lyaps.append(lle)
