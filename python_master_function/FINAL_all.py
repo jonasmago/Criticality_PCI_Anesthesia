@@ -52,6 +52,7 @@ np.int = int
 MAX_TRIALS = 200
 MAX_S = 2000
 
+MAX_TRIALS = 2
 
 # Flags to enable/disable analyses
 RUN_EOC = True
@@ -976,6 +977,7 @@ if __name__ == "__main__":
         # Load Epoch + Raw
         mne_epochs_raw = mne.read_epochs(path, preload=True)
         if len(mne_epochs_raw) < 1:
+            print ('### skip, no valid epoch ###')
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
             continue
 
@@ -983,6 +985,7 @@ if __name__ == "__main__":
         mne_epochs_raw.pick('eeg')
 
         if len(mne_epochs_32.info['ch_names']) <  5:
+            print ('### skip, less than 5 good channels ###')
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
             continue
 
