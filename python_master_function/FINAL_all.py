@@ -52,25 +52,23 @@ np.int = int
 MAX_TRIALS = 200
 MAX_S = 2000
 
-MAX_TRIALS = 2
-
 # Flags to enable/disable analyses
-RUN_EOC = True
-RUN_EOS = False
-RUN_PRED = False
-RUN_SLOPE = False
-RUN_DFA = False
-RUN_AVC = False
-RUN_STD_DIST = False
-
-
 # RUN_EOC = True
-# RUN_EOS = True
-# RUN_PRED = True
-# RUN_SLOPE = True
-# RUN_DFA = True
-# RUN_AVC = True
-# RUN_STD_DIST = True
+# RUN_EOS = False
+# RUN_PRED = False
+# RUN_SLOPE = False
+# RUN_DFA = False
+# RUN_AVC = False
+# RUN_STD_DIST = False
+
+
+RUN_EOC = True
+RUN_EOS = True
+RUN_PRED = True
+RUN_SLOPE = True
+RUN_DFA = True
+RUN_AVC = True
+RUN_STD_DIST = True
 
 
 ###################################################
@@ -356,7 +354,7 @@ def fixed_chaos(trial, epochs, lpfrequency):
         else:
             failed.append(1)
 
-    print(f'Done Trial {str(trial)} Fixed {str(lpfrequency)} Hz')
+    # print(f'Done Trial {str(trial)} Fixed {str(lpfrequency)} Hz')
 
     return K_ch, hfreq, failed
 
@@ -398,7 +396,7 @@ def filter_and_chaos(trial, epochs):
             ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=hfreq_tmp,verbose=False)
             K_ch.append(chaos_pipeline(ch_filt))
             hfreq.append(hfreq_tmp)
-    print('Done Trial {}'.format(str(trial)))
+    # print('Done Trial {}'.format(str(trial)))
 
     return K_ch, hfreq, failed
 
@@ -491,7 +489,7 @@ def calculate_values(trial, epochs):
     #PLE = Methods_EOS.ple(data_tr, m = 5, tau = 2)
     #PLI = Methods_EOS.pli(data_tr)
     PCF, OR_mean, orph_vector_tr, orpa_vector_tr = pcf(data_tr)
-    print(f'done Trial {str(trial)}')
+    # print(f'Done Trial {str(trial)}')
 
     #return PLI, PLE, PCF, OR_mean, OR_var
     return PCF, OR_mean
@@ -563,7 +561,7 @@ def get_pred(trial, epochs):
         kdf, _ = nk.fractal_katz(channel_data)
         KDF.append(kdf)
 
-    print('Done Trial {}'.format(str(trial)))
+    # print('Done Trial {}'.format(str(trial)))
 
     return Lyaps, Dims, Ent, LZC, KDF
 
@@ -1144,15 +1142,11 @@ if __name__ == "__main__":
         current_time_est = datetime.now(pytz.timezone("America/New_York")).strftime("%Y-%m-%d %H:%M:%S")
 
         # Add to row_data
+        row_data['MAX_TRIALS'] = MAX_TRIALS
+        row_data['MAX_S'] = MAX_S
         row_data['elapsed_time_sec'] = round(elapsed_time_sec, 2)
         row_data['timestamp_est'] = current_time_est
 
         # Save results
         update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
         print(f"⏱️ Elapsed time for file: {elapsed_time_sec:.2f} seconds (finished at {current_time_est} EST)")
-
-
-        # SAVE RESULTS
-        update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
-        print(f"⏱️ Elapsed time for file: {time.time() - t_start:.2f} seconds")
-
