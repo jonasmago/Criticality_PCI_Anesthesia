@@ -50,9 +50,6 @@ np.int = int
 MAX_TRIALS = 200
 MAX_S = 2000
 
-MAX_TRIALS = 20
-MAX_S = 200
-
 
 # Flags to enable/disable analyses
 # RUN_EOC = False
@@ -979,7 +976,7 @@ if __name__ == "__main__":
         mne_epochs_32 = mne_epochs_raw.copy()
         mne_epochs_raw.pick('eeg')
 
-        if len(mne_epochs_32) < 5 or len(mne_epochs_32.info['ch_names']) <  10:
+        if len(mne_epochs_32) < 1 or len(mne_epochs_32.info['ch_names']) <  5:
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
             continue
 

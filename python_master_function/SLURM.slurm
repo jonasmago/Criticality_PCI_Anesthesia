@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=def-michael9     # Replace with your actual account
 #SBATCH --job-name=big_all_01          # Job name
-#SBATCH --time=08:00:00            # Max wall time (HH:MM:SS)
+#SBATCH --time=24:00:00            # Max wall time (HH:MM:SS)
 #SBATCH --cpus-per-task=40         # Number of CPUs
 #SBATCH --mem=192G                 # Memory (adjust as needed)
 #SBATCH --output=logs/final_%j.out # Standard output (%j = job ID)
