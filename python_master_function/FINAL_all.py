@@ -8,6 +8,8 @@ import random
 import sys
 import glob
 import time
+from datetime import datetime
+import pytz
 
 # ====== Scientific Python ======
 import numpy as np
@@ -52,22 +54,22 @@ MAX_S = 2000
 
 
 # Flags to enable/disable analyses
-# RUN_EOC = False
-# RUN_EOS = False
-# RUN_PRED = True
-# RUN_SLOPE = False
-# RUN_DFA = False
-# RUN_AVC = False
-# RUN_STD_DIST = False
-
-
 RUN_EOC = True
-RUN_EOS = True
-RUN_PRED = True
-RUN_SLOPE = True
-RUN_DFA = True
-RUN_AVC = True
-RUN_STD_DIST = True
+RUN_EOS = False
+RUN_PRED = False
+RUN_SLOPE = False
+RUN_DFA = False
+RUN_AVC = False
+RUN_STD_DIST = False
+
+
+# RUN_EOC = True
+# RUN_EOS = True
+# RUN_PRED = True
+# RUN_SLOPE = True
+# RUN_DFA = True
+# RUN_AVC = True
+# RUN_STD_DIST = True
 
 
 ###################################################
@@ -953,7 +955,7 @@ if __name__ == "__main__":
         paths.sort()
         # print (paths)
 
-    start = 0
+    start = 54
     for path_i_relative, path in enumerate(paths[start:]):
 
         path_i = path_i_relative+start
@@ -973,10 +975,14 @@ if __name__ == "__main__":
 
         # Load Epoch + Raw
         mne_epochs_raw = mne.read_epochs(path, preload=True)
+        if len(mne_epochs_raw) < 1:
+            update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+            continue
+
         mne_epochs_32 = mne_epochs_raw.copy()
         mne_epochs_raw.pick('eeg')
 
-        if len(mne_epochs_32) < 1 or len(mne_epochs_32.info['ch_names']) <  5:
+        if len(mne_epochs_32.info['ch_names']) <  5:
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
             continue
 
@@ -1130,7 +1136,20 @@ if __name__ == "__main__":
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
+        # Compute elapsed time and current time in EST
+        elapsed_time_sec = time.time() - t_start
+        current_time_est = datetime.now(pytz.timezone("America/New_York")).strftime("%Y-%m-%d %H:%M:%S")
+
+        # Add to row_data
+        row_data['elapsed_time_sec'] = round(elapsed_time_sec, 2)
+        row_data['timestamp_est'] = current_time_est
+
+        # Save results
+        update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+        print(f"⏱️ Elapsed time for file: {elapsed_time_sec:.2f} seconds (finished at {current_time_est} EST)")
+
+
         # SAVE RESULTS
         update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
-    print(f"⏱️ Elapsed time for file: {time.time() - t_start:.2f} seconds")
+        print(f"⏱️ Elapsed time for file: {time.time() - t_start:.2f} seconds")
 
