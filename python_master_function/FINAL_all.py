@@ -274,7 +274,7 @@ def get_channel_hurst(ch_data,sfreq):
 
     analytic_signal = hilbert(ch_data)
     amplitude_envelope = np.abs(analytic_signal)
-
+    # amplitude_envelope = (amplitude_envelope - np.mean(amplitude_envelope)) / np.std(amplitude_envelope)
     try:
         hurst_fh, _ =   nk.fractal_hurst(amplitude_envelope, scale=scale, show=False)
     except:
@@ -954,7 +954,7 @@ if __name__ == "__main__":
         paths.sort()
         # print (paths)
 
-    start = 54
+    start = 287
     for path_i_relative, path in enumerate(paths[start:]):
 
         path_i = path_i_relative+start
