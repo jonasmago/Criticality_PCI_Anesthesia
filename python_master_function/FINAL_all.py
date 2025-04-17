@@ -955,7 +955,7 @@ if __name__ == "__main__":
         paths.sort()
         # print (paths)
 
-    start = 287
+    start = 0
     for path_i_relative, path in enumerate(paths[start:]):
 
         path_i = path_i_relative+start
