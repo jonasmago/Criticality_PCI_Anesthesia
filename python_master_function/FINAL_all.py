@@ -53,22 +53,22 @@ MAX_TRIALS = 200
 MAX_S = 2000
 
 # Flags to enable/disable analyses
-# RUN_EOC = True
-# RUN_EOS = False
-# RUN_PRED = False
-# RUN_SLOPE = False
-# RUN_DFA = False
-# RUN_AVC = False
-# RUN_STD_DIST = False
-
-
 RUN_EOC = True
-RUN_EOS = True
-RUN_PRED = True
-RUN_SLOPE = True
+RUN_EOS = False
+RUN_PRED = False
+RUN_SLOPE = False
 RUN_DFA = True
-RUN_AVC = True
-RUN_STD_DIST = True
+RUN_AVC = False
+RUN_STD_DIST = False
+
+
+# RUN_EOC = True
+# RUN_EOS = True
+# RUN_PRED = True
+# RUN_SLOPE = True
+# RUN_DFA = True
+# RUN_AVC = True
+# RUN_STD_DIST = True
 
 
 ###################################################
@@ -274,7 +274,8 @@ def get_channel_hurst(ch_data,sfreq):
 
     analytic_signal = hilbert(ch_data)
     amplitude_envelope = np.abs(analytic_signal)
-    # amplitude_envelope = (amplitude_envelope - np.mean(amplitude_envelope)) / np.std(amplitude_envelope)
+    amplitude_envelope = (amplitude_envelope - np.mean(amplitude_envelope)) / np.std(amplitude_envelope) # I added this to make DFA same as FH
+    
     try:
         hurst_fh, _ =   nk.fractal_hurst(amplitude_envelope, scale=scale, show=False)
     except:
@@ -1022,6 +1023,19 @@ if __name__ == "__main__":
                 dict_data.update({
                     'eoc_results': eoc_results,
                     'eoc_results_interpolated': eoc_results_interpolated
+                })
+                
+                K_median_f4, K_median_interpolated_f4, Freq_f4, Nopeak_f4, eoc_results_f4, eoc_results_interpolated_f4 = features_EOC(
+                    mne_epochs_32, k_type='fixed', hfrequ=4, max_trials=MAX_TRIALS,
+                    bad_indices=bad_indices, good_indices=good_indices)
+                
+                row_data.update({
+                    'K_median_f4': K_median_f4, 'K_median_interpolated_f4': K_median_interpolated_f4,
+                    'Freq_f4': Freq_f4, 'Nopeak_f4': Nopeak_f4
+                })
+                dict_data.update({
+                    'eoc_results_f4': eoc_results_f4,
+                    'eoc_results_interpolated_f4': eoc_results_interpolated_f4
                 })
 
             except Exception as e:
