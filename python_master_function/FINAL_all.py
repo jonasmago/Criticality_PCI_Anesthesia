@@ -1321,52 +1321,51 @@ if __name__ == "__main__":
 
 
 
-            # ========== ANTROPY ========== #
-            if RUN_ANTROPY:
-                print(">>>>> processing Antropy Features <<<<<")
-                try:
-                    vals = features_Antropy(mne_epochs_32, lfreq=0.5, hfreq=45, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
+        # ========== ANTROPY ========== #
+        if RUN_ANTROPY:
+            print(">>>>> processing Antropy Features <<<<<")
+            try:
+                vals = features_Antropy(mne_epochs_32, lfreq=0.5, hfreq=45, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
 
-                    # Define output names
-                    names = [
-                        'ant_lziv', 'ant_perm_entropy', 'ant_spectral_entropy', 'ant_sample_entropy',
-                        'ant_hjorth_mobility', 'ant_hjorth_complexity',
-                        'ant_lziv_int', 'ant_perm_entropy_int', 'ant_spectral_entropy_int', 'ant_sample_entropy_int',
-                        'ant_hjorth_mobility_int', 'ant_hjorth_complexity_int'
-                    ]
+                # Define output names
+                names = [
+                    'ant_lziv', 'ant_perm_entropy', 'ant_spectral_entropy', 'ant_sample_entropy',
+                    'ant_hjorth_mobility', 'ant_hjorth_complexity',
+                    'ant_lziv_int', 'ant_perm_entropy_int', 'ant_spectral_entropy_int', 'ant_sample_entropy_int',
+                    'ant_hjorth_mobility_int', 'ant_hjorth_complexity_int'
+                ]
 
-                    # First 12 outputs go into row_data
-                    row_data.update({name: val for name, val in zip(names, vals[:12])})
+                # First 12 outputs go into row_data
+                row_data.update({name: val for name, val in zip(names, vals[:12])})
 
-                    # The last two are the detailed results arrays
-                    dict_data['antropy_results'] = vals[12]
-                    dict_data['antropy_results_int'] = vals[13]
+                # The last two are the detailed results arrays
+                dict_data['antropy_results'] = vals[12]
+                dict_data['antropy_results_int'] = vals[13]
 
-                except Exception as e:
-                    print(f"[ANTROPY] Error: {e}")
-                    import pdb; pdb.set_trace()
+            except Exception as e:
+                print(f"[ANTROPY] Error: {e}")
                 import pdb; pdb.set_trace()
-                update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+            update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
 
 
 
-            if RUN_BANDPOWER:
-                print(">>>>> processing Band Powers <<<<<")
-                try:
-                    vals = features_Bandpower(mne_epochs_32, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
-                    names = [
-                        'delta', 'theta', 'alpha', 'beta', 'gamma',
-                        'delta_int', 'theta_int', 'alpha_int', 'beta_int', 'gamma_int'
-                    ]
-                    row_data.update({name: val for name, val in zip(names, vals[:10])})
-                    dict_data['bandpower_results'] = vals[10]
-                    dict_data['bandpower_results_int'] = vals[11]
-                except Exception as e:
-                    print(f"[BANDPOWER] Error: {e}")
-                    import pdb; pdb.set_trace()
-                update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+        if RUN_BANDPOWER:
+            print(">>>>> processing Band Powers <<<<<")
+            try:
+                vals = features_Bandpower(mne_epochs_32, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
+                names = [
+                    'delta', 'theta', 'alpha', 'beta', 'gamma',
+                    'delta_int', 'theta_int', 'alpha_int', 'beta_int', 'gamma_int'
+                ]
+                row_data.update({name: val for name, val in zip(names, vals[:10])})
+                dict_data['bandpower_results'] = vals[10]
+                dict_data['bandpower_results_int'] = vals[11]
+            except Exception as e:
+                print(f"[BANDPOWER] Error: {e}")
+                import pdb; pdb.set_trace()
+            update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
 
