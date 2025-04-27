@@ -385,6 +385,7 @@ def filter_and_chaos(trial, epochs):
         # get psd of channels
         freqs, psd_ch = signal.welch(data_ch,fs,nperseg=samples)
 
+
         fm.fit(freqs, psd_ch, freq_range)
 
         if fm.peak_params_.shape[0] == 0:
@@ -1022,6 +1023,8 @@ def get_bandpower_measures(trial, epochs, fs=256):
     trial_data = epochs[trial]
 
     freqs, psd = signal.welch(trial_data, fs=fs, nperseg=fs*2, axis=-1)
+
+    psd = psd * 1e12
 
     bands = {
         'delta': (0.5, 4),
