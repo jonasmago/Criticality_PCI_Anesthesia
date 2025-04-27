@@ -667,7 +667,7 @@ def features_slope (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices
 
 
 def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices=None): 
-    
+    import pdb; pdb.set_trace()
     epochs = mne_epochs.get_data()
     nr_trials = min([len(epochs), max_trials])
     nr_channels = epochs.shape[1]
