@@ -655,8 +655,8 @@ def features_slope (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices
     for ch in range(len(psds_interpoalted)):
         fm = FOOOF()
         fm.fit(freqs, psds_interpoalted[ch,:], freq_range)
-        slope_id = -fm.aperiodic_params_[1]
-        Slope_space_id.append(slope_id)
+        slope_id_ch = -fm.aperiodic_params_[1] #Here was an error in the original script, overriding slope_id
+        Slope_space_id.append(slope_id_ch)
 
     Slope_space_id = np.array(Slope_space_id)
     Slope_space_id_interpoalted = Slope_space_id.copy()
