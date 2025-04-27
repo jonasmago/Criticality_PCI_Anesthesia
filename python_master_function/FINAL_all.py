@@ -704,7 +704,11 @@ def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, ba
 
         # Subtract aperiodic background per channel
         background_ch = fm_ch._ap_fit
-        psds_interpolated_corrected[ch, :] = psds_interpolated[ch, :] - background_ch
+        
+        interp_func = interp1d(fit_freqs, background_ch, bounds_error=False, fill_value="extrapolate")
+        background_ch_full = interp_func(freqs)
+
+        psds_interpolated_corrected[ch, :] = psds_interpolated[ch, :] - background_ch_full
         psds_interpolated_corrected[ch, :] = np.clip(psds_interpolated_corrected[ch, :], a_min=0, a_max=None)
 
     Slope_space_id = np.array(Slope_space_id)
