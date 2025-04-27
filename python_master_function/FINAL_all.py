@@ -1391,7 +1391,6 @@ if __name__ == "__main__":
                 }
 
             except Exception as e:
-                import pdb; pdb.set_trace()
                 print(f"[SLOPE_PSD] Error: {e}")
                 # import traceback; traceback.print_exc()
                 # import pdb; pdb.set_trace()
@@ -1479,7 +1478,6 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[ANTROPY] Error: {e}")
-                import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
