@@ -61,8 +61,9 @@ RUN_SLOPE = False
 RUN_DFA = False
 RUN_AVC = False
 RUN_STD_DIST = False
-RUN_ANTROPY = True
-RUN_BANDPOWER = True
+RUN_ANTROPY = False
+RUN_BANDPOWER = False
+RUN_SLOPE_PSD = True
 
 
 # RUN_EOC = True
@@ -1346,6 +1347,52 @@ if __name__ == "__main__":
                 # import traceback; traceback.print_exc()
                 # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+
+
+
+        # ========== SLOPE PSD ========== #
+        if RUN_SLOPE_PSD:
+            print(">>>>> processing Slope + Bandpower <<<<<")
+            try:
+                vals = features_slope_bandpower(mne_epochs_32, lfreq=0.5, hfreq=40, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
+                
+                # Save slopes
+                row_data.update({
+                    'sp_slope_id': vals[0],
+                    'sp_slope_id_interpolated': vals[1]
+                })
+
+                # Save bandpowers to row_data: both raw and corrected, both from interpolated PSD
+                band_names = ['delta', 'theta', 'alpha', 'beta', 'gamma']
+
+                sp_bandpower_raw_avg = vals[11]       # dict: band name -> mean raw PSD power
+                sp_bandpower_corrected_avg = vals[12] # dict: band name -> mean corrected PSD power
+
+                for band in band_names:
+                    row_data[f'sp_{band}_raw'] = sp_bandpower_raw_avg.get(band, np.nan)
+                    row_data[f'sp_{band}_corrected'] = sp_bandpower_corrected_avg.get(band, np.nan)
+
+                # Save full arrays into dict_data
+                dict_data['slope_psd'] = {
+                    'sp_slope_space_id': vals[2],
+                    'sp_slope_space_id_interpolated': vals[3],
+                    'sp_psds_mean': vals[4],
+                    'sp_psds_mean_interpolated': vals[5],
+                    'sp_psds': vals[6],
+                    'sp_psds_interpolated': vals[7],
+                    'sp_freqs': vals[8],
+                    'sp_bandpower_raw_per_channel': vals[9],
+                    'sp_bandpower_corrected_per_channel': vals[10],
+                    'sp_bandpower_raw_avg': vals[11],
+                    'sp_bandpower_corrected_avg': vals[12]
+                }
+
+            except Exception as e:
+                print(f"[SLOPE_PSD] Error: {e}")
+                # import traceback; traceback.print_exc()
+                # import pdb; pdb.set_trace()
+            update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+
 
         # ========== DFA ========== #
         if RUN_DFA:
