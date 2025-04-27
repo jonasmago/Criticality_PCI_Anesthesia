@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=def-michael9     # Replace with your actual account
-#SBATCH --job-name=big_all_03          # Job name
+#SBATCH --job-name=big_all          # Job name
 # #SBATCH --time=40:00:00            # Max wall time (HH:MM:SS)
 #SBATCH --time=10:00:00
 #SBATCH --cpus-per-task=40         # Number of CPUs
@@ -19,4 +19,4 @@ module load python/3.10
 source ../../../venv/bin/activate 
 
 # Run the Python script
-python FINAL_all.py -device c -name big_all_03
+python FINAL_all.py -device c -name big_all
