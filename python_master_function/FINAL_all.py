@@ -1345,6 +1345,7 @@ if __name__ == "__main__":
                 except Exception as e:
                     print(f"[ANTROPY] Error: {e}")
                     import pdb; pdb.set_trace()
+                import pdb; pdb.set_trace()
                 update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
