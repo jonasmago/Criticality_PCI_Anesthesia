@@ -30,6 +30,7 @@ import mne.io
 import neurokit2 as nk
 from fooof import FOOOF
 from antropy import lziv_complexity
+import antropy
 from sklearn import *
 import edgeofpy as eop
 
@@ -53,23 +54,26 @@ MAX_TRIALS = 200
 MAX_S = 2000
 
 # Flags to enable/disable analyses
+RUN_EOC = False
+RUN_EOS = False
+RUN_PRED = False
+RUN_SLOPE = False
+RUN_DFA = False
+RUN_AVC = False
+RUN_STD_DIST = False
+RUN_ANTROPY = True
+RUN_BANDPOWER = True
+
+
 # RUN_EOC = True
-# RUN_EOS = False
-# RUN_PRED = False
-# RUN_SLOPE = False
+# RUN_EOS = True
+# RUN_PRED = True
+# RUN_SLOPE = True
 # RUN_DFA = True
-# RUN_AVC = False
-# RUN_STD_DIST = False
-
-
-RUN_EOC = True
-RUN_EOS = True
-RUN_PRED = True
-RUN_SLOPE = True
-RUN_DFA = True
-RUN_AVC = True
-RUN_STD_DIST = True
-
+# RUN_AVC = True
+# RUN_STD_DIST = True
+# RUN_ANTROPY = True
+# RUN_BANDPOWER = True
 
 ###################################################
 ###################################################
@@ -921,6 +925,171 @@ def update_results_table(path, row_dict, results_table_path, results_dict_dir, d
     print('saving is done')
 
 
+
+
+
+
+
+def get_antropy_measures(trial, epochs):
+    ant_lziv = []
+    ant_perm_entropy = []
+    ant_spectral_entropy = []
+    ant_sample_entropy = []
+    ant_hjorth_mobility = []
+    ant_hjorth_complexity = []
+
+    nr_channels = epochs.shape[1]
+    trial_data = epochs[trial]
+
+    for ch in range(nr_channels):
+        time_series = trial_data[ch]
+
+        threshold = np.median(time_series)
+        binary_sequence = (time_series > threshold).astype(int)
+        binary_string = ''.join(binary_sequence.astype(str))
+
+        ant_lziv.append(lziv_complexity(binary_string, normalize=True))
+        ant_perm_entropy.append(antropy.perm_entropy(time_series, normalize=True))
+        ant_spectral_entropy.append(antropy.spectral_entropy(time_series, sf=256, method='welch', normalize=True))
+        ant_sample_entropy.append(antropy.sample_entropy(time_series))
+
+        mobility, complexity = antropy.hjorth_params(time_series)
+        ant_hjorth_mobility.append(mobility)
+        ant_hjorth_complexity.append(complexity)
+
+    return (ant_lziv, ant_perm_entropy, ant_spectral_entropy, ant_sample_entropy, ant_hjorth_mobility, ant_hjorth_complexity)
+
+
+def features_Antropy(mne_epochs, lfreq=0.5, hfreq=45, fs=256, max_trials=30, bad_indices=None):
+    epochs_res = mne_epochs
+    epochs_filt = epochs_res.filter(lfreq, hfreq, verbose=False)
+
+    nr_trials = min(len(epochs_filt), max_trials)
+    epochs = epochs_filt.get_data()
+    nr_channels = epochs.shape[1]
+
+    ctx = mp.get_context("spawn")
+    pool = ctx.Pool(n_cpus)
+
+    input = []
+    for trial in range(nr_trials):
+        input.append((trial, epochs))
+
+    results = pool.starmap(get_antropy_measures, input)
+
+    results = np.array(results)
+    if bad_indices is not None:
+        results[:, :, bad_indices] = np.nan
+
+    results_int = np.array(results)
+
+    # Average across trials and channels
+    ant_lziv = np.nanmean(results[:, 0, :])
+    ant_perm_entropy = np.nanmean(results[:, 1, :])
+    ant_spectral_entropy = np.nanmean(results[:, 2, :])
+    ant_sample_entropy = np.nanmean(results[:, 3, :])
+    ant_hjorth_mobility = np.nanmean(results[:, 4, :])
+    ant_hjorth_complexity = np.nanmean(results[:, 5, :])
+
+    ant_lziv_int = np.nanmean(results_int[:, 0, :])
+    ant_perm_entropy_int = np.nanmean(results_int[:, 1, :])
+    ant_spectral_entropy_int = np.nanmean(results_int[:, 2, :])
+    ant_sample_entropy_int = np.nanmean(results_int[:, 3, :])
+    ant_hjorth_mobility_int = np.nanmean(results_int[:, 4, :])
+    ant_hjorth_complexity_int = np.nanmean(results_int[:, 5, :])
+
+    pool.close()
+    pool.join()
+
+    return (ant_lziv, ant_perm_entropy, ant_spectral_entropy, ant_sample_entropy,
+            ant_hjorth_mobility, ant_hjorth_complexity,
+            ant_lziv_int, ant_perm_entropy_int, ant_spectral_entropy_int,
+            ant_sample_entropy_int, ant_hjorth_mobility_int, ant_hjorth_complexity_int,
+            results, results_int)
+
+
+
+
+
+def get_bandpower_measures(trial, epochs, fs=256):
+    delta = []
+    theta = []
+    alpha = []
+    beta = []
+    gamma = []
+
+    nr_channels = epochs.shape[1]
+    trial_data = epochs[trial]
+
+    freqs, psd = signal.welch(trial_data, fs=fs, nperseg=fs*2, axis=-1)
+
+    bands = {
+        'delta': (0.5, 4),
+        'theta': (4, 8),
+        'alpha': (8, 12),
+        'beta': (12, 30),
+        'gamma': (30, 45)
+    }
+
+    for ch in range(nr_channels):
+        for band_name, (fmin, fmax) in bands.items():
+            freq_mask = (freqs >= fmin) & (freqs < fmax)
+            band_power = np.mean(psd[ch, freq_mask])
+            if band_name == 'delta':
+                delta.append(band_power)
+            elif band_name == 'theta':
+                theta.append(band_power)
+            elif band_name == 'alpha':
+                alpha.append(band_power)
+            elif band_name == 'beta':
+                beta.append(band_power)
+            elif band_name == 'gamma':
+                gamma.append(band_power)
+
+    return delta, theta, alpha, beta, gamma
+
+
+def features_Bandpower(mne_epochs, fs=256, max_trials=30, bad_indices=None):
+    epochs = mne_epochs.get_data()
+    nr_trials = min(len(epochs), max_trials)
+
+    ctx = mp.get_context("spawn")
+    pool = ctx.Pool(n_cpus)
+
+    input = []
+    for trial in range(nr_trials):
+        input.append((trial, epochs))
+
+    results = pool.starmap(get_bandpower_measures, input)
+
+    results = np.array(results)
+    if bad_indices is not None:
+        results[:, :, bad_indices] = np.nan
+
+    results_int = np.array(results)
+
+    delta = np.nanmean(results[:, 0, :])
+    theta = np.nanmean(results[:, 1, :])
+    alpha = np.nanmean(results[:, 2, :])
+    beta = np.nanmean(results[:, 3, :])
+    gamma = np.nanmean(results[:, 4, :])
+
+    delta_int = np.nanmean(results_int[:, 0, :])
+    theta_int = np.nanmean(results_int[:, 1, :])
+    alpha_int = np.nanmean(results_int[:, 2, :])
+    beta_int = np.nanmean(results_int[:, 3, :])
+    gamma_int = np.nanmean(results_int[:, 4, :])
+
+    pool.close()
+    pool.join()
+
+    return (delta, theta, alpha, beta, gamma,
+            delta_int, theta_int, alpha_int, beta_int, gamma_int,
+            results, results_int)
+
+
+
+
 ###################################################
 ###################################################
 
@@ -1149,6 +1318,53 @@ if __name__ == "__main__":
                 # import traceback; traceback.print_exc()
                 # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+
+
+
+            # ========== ANTROPY ========== #
+            if RUN_ANTROPY:
+                print(">>>>> processing Antropy Features <<<<<")
+                try:
+                    vals = features_Antropy(mne_epochs_32, lfreq=0.5, hfreq=45, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
+
+                    # Define output names
+                    names = [
+                        'ant_lziv', 'ant_perm_entropy', 'ant_spectral_entropy', 'ant_sample_entropy',
+                        'ant_hjorth_mobility', 'ant_hjorth_complexity',
+                        'ant_lziv_int', 'ant_perm_entropy_int', 'ant_spectral_entropy_int', 'ant_sample_entropy_int',
+                        'ant_hjorth_mobility_int', 'ant_hjorth_complexity_int'
+                    ]
+
+                    # First 12 outputs go into row_data
+                    row_data.update({name: val for name, val in zip(names, vals[:12])})
+
+                    # The last two are the detailed results arrays
+                    dict_data['antropy_results'] = vals[12]
+                    dict_data['antropy_results_int'] = vals[13]
+
+                except Exception as e:
+                    print(f"[ANTROPY] Error: {e}")
+                update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+
+
+
+
+
+            if RUN_BANDPOWER:
+                print(">>>>> processing Band Powers <<<<<")
+                try:
+                    vals = features_Bandpower(mne_epochs_32, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
+                    names = [
+                        'delta', 'theta', 'alpha', 'beta', 'gamma',
+                        'delta_int', 'theta_int', 'alpha_int', 'beta_int', 'gamma_int'
+                    ]
+                    row_data.update({name: val for name, val in zip(names, vals[:10])})
+                    dict_data['bandpower_results'] = vals[10]
+                    dict_data['bandpower_results_int'] = vals[11]
+                except Exception as e:
+                    print(f"[BANDPOWER] Error: {e}")
+                update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+
 
 
         # Compute elapsed time and current time in EST
