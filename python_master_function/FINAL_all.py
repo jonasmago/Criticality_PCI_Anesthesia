@@ -1388,6 +1388,7 @@ if __name__ == "__main__":
                 }
 
             except Exception as e:
+                import pdb; pdb.set_trace()
                 print(f"[SLOPE_PSD] Error: {e}")
                 # import traceback; traceback.print_exc()
                 # import pdb; pdb.set_trace()
