@@ -628,8 +628,6 @@ def features_slope (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices
     nr_trials = min([len(epochs), max_trials])
     nr_channels =  epochs.shape[1]
 
-    # search individual lowpass frequency
-    fm = FOOOF()
     # Set the frequency range to fit the model
     freq_range = [lfreq, hfreq]
     data_con = np.concatenate(epochs,axis = 1)
@@ -663,6 +661,89 @@ def features_slope (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices
     Slope_space_id[bad_indices]=np.nan
 
     return slope_id, slope_id_interpoalted, Slope_space_id, Slope_space_id_interpoalted, np.array(psds_mean), np.array(psds_mean_interpolated), np.array(psds), np.array(psds_interpoalted), np.array(freqs), 
+
+
+
+
+
+def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices=None): 
+    
+    epochs = mne_epochs.get_data()
+    nr_trials = min([len(epochs), max_trials])
+    nr_channels = epochs.shape[1]
+
+    # Set the frequency range to fit the model
+    freq_range = [lfreq, hfreq]
+    data_con = np.concatenate(epochs, axis=1)
+    # get psd of channels
+    freqs, psds = signal.welch(data_con, fs, nperseg=5*1024)
+
+    # Get average Slope interpolated
+    psds_interpoalted = psds.copy()
+    psds_mean_interpolated = np.mean(psds_interpoalted, axis=0)
+    fm = FOOOF()
+    fm.fit(freqs, psds_mean_interpolated, freq_range)
+    slope_id_interpoalted = -fm.aperiodic_params_[1]
+    
+    # Get average Slope not interpolated
+    psds[bad_indices, :] = np.nan
+    psds_mean = np.nanmean(psds, axis=0)
+    fm_nointerp = FOOOF()
+    fm_nointerp.fit(freqs, psds_mean, freq_range)
+    slope_id = -fm_nointerp.aperiodic_params_[1]
+
+    Slope_space_id = []
+    # Get Space-resolved Slope
+    for ch in range(len(psds_interpoalted)):
+        fm_ch = FOOOF()
+        fm_ch.fit(freqs, psds_interpoalted[ch, :], freq_range)
+        slope_id_ch = -fm_ch.aperiodic_params_[1]
+        Slope_space_id.append(slope_id_ch)
+
+    Slope_space_id = np.array(Slope_space_id)
+    Slope_space_id_interpoalted = Slope_space_id.copy()
+    Slope_space_id[bad_indices] = np.nan
+
+    # === Added Bandpower Computation ===
+    bands = {
+        'delta': (0.5, 4),
+        'theta': (4, 8),
+        'alpha': (8, 12),
+        'beta': (12, 30),
+        'gamma': (30, 45)
+    }
+
+    # Create slope-corrected PSD using the *interpolated* fit
+    background = fm._ap_fit
+    psds_interpoalted_corrected = psds_interpoalted - background[np.newaxis, :]
+    psds_interpoalted_corrected = np.clip(psds_interpoalted_corrected, a_min=0, a_max=None)
+
+    def compute_bandpower(psd, freqs, bands):
+        bandpower_per_band = {}
+        for band_name, (fmin, fmax) in bands.items():
+            freq_mask = (freqs >= fmin) & (freqs < fmax)
+            bandpower_per_band[band_name] = np.mean(psd[:, freq_mask], axis=1)  # mean across frequencies
+        return bandpower_per_band
+
+    bandpower_raw_per_channel = compute_bandpower(psds_interpoalted, freqs, bands)
+    bandpower_corrected_per_channel = compute_bandpower(psds_interpoalted_corrected, freqs, bands)
+
+    bandpower_raw_avg = {k: np.nanmean(v) for k, v in bandpower_raw_per_channel.items()}
+    bandpower_corrected_avg = {k: np.nanmean(v) for k, v in bandpower_corrected_per_channel.items()}
+    # === End of Bandpower Computation ===
+
+    return (slope_id, slope_id_interpoalted, 
+            Slope_space_id, Slope_space_id_interpoalted, 
+            np.array(psds_mean), np.array(psds_mean_interpolated), 
+            np.array(psds), np.array(psds_interpoalted), np.array(freqs),
+            bandpower_raw_per_channel, bandpower_corrected_per_channel,
+            bandpower_raw_avg, bandpower_corrected_avg)
+
+
+
+
+
+
 
 ###################################################
 ## Methods Chaos
