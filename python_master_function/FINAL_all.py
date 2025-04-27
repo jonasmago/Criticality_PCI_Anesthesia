@@ -23,6 +23,7 @@ from scipy.fft import fft, ifft
 from scipy.fftpack import rfft, irfft
 from scipy.io import loadmat, savemat
 from scipy.signal import butter, firls, hilbert, lfilter, welch
+from scipy.interpolate import interp1d
 
 # ====== External Libraries ======
 import mne
@@ -667,7 +668,6 @@ def features_slope (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices
 
 
 def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices=None): 
-    import pdb; pdb.set_trace()
     epochs = mne_epochs.get_data()
     nr_trials = min([len(epochs), max_trials])
     nr_channels = epochs.shape[1]
@@ -705,7 +705,7 @@ def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, ba
         # Subtract aperiodic background per channel
         background_ch = fm_ch._ap_fit
         
-        interp_func = interp1d(fit_freqs, background_ch, bounds_error=False, fill_value="extrapolate")
+        interp_func = interp1d(fm_ch.freqs, background_ch, bounds_error=False, fill_value="extrapolate")
         background_ch_full = interp_func(freqs)
 
         psds_interpolated_corrected[ch, :] = psds_interpolated[ch, :] - background_ch_full
@@ -1499,7 +1499,6 @@ if __name__ == "__main__":
                 dict_data['bandpower_results_int'] = vals[11]
             except Exception as e:
                 print(f"[BANDPOWER] Error: {e}")
-                import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
