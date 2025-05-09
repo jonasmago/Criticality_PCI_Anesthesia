@@ -10,6 +10,7 @@ import glob
 import time
 from datetime import datetime
 import pytz
+import math
 
 # ====== Scientific Python ======
 import numpy as np
@@ -49,6 +50,7 @@ warnings.filterwarnings('ignore', category=RuntimeWarning)
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 np.int = int
+np.math = math
 
 # ========== CONFIG ========== #
 MAX_TRIALS = 200
