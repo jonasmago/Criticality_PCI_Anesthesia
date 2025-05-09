@@ -53,13 +53,13 @@ np.int = int
 np.math = math
 
 # ========== CONFIG ========== #
-MAX_TRIALS = 200
+MAX_TRIALS = 1
 MAX_S = 2000
 
 # Flags to enable/disable analyses
 RUN_EOC = False
 RUN_EOS = False
-RUN_PRED = False
+RUN_PRED = True
 RUN_SLOPE = False
 RUN_DFA = False
 RUN_AVC = False
@@ -1499,7 +1499,7 @@ if __name__ == "__main__":
         if RUN_ANTROPY:
             print(">>>>> processing Antropy Features <<<<<")
             try:
-                vals = features_Antropy(mne_epochs_32, lfreq=0.5, hfreq=45, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
+                vals = features_Antropy(mne_epochs_32, lfreq=0.5, hfreq=40, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
 
                 # Define output names
                 names = [
@@ -1556,3 +1556,5 @@ if __name__ == "__main__":
         # Save results
         update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
         print(f"⏱️ Elapsed time for file: {elapsed_time_sec:.2f} seconds (finished at {current_time_est} EST)")
+
+        import pdb; pdb.set_trace()
