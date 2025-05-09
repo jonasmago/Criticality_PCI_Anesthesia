@@ -52,47 +52,13 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 np.int = int
 np.math = math
 
-# ========== CONFIG ========== #
-MAX_TRIALS = 1
-MAX_S = 2000
-
-# Flags to enable/disable analyses
-RUN_EOC = False
-RUN_EOS = False
-RUN_PRED = True
-RUN_SLOPE = False
-RUN_DFA = False
-RUN_AVC = False
-RUN_STD_DIST = False
-RUN_ANTROPY = True
-RUN_BANDPOWER = False
-RUN_SLOPE_PSD = False
-
-
-# RUN_EOC = True
-# RUN_EOS = True
-# RUN_PRED = True
-# RUN_SLOPE = True
-# RUN_DFA = True
-# RUN_AVC = True
-# RUN_STD_DIST = True
-# RUN_ANTROPY = True
-# RUN_BANDPOWER = True
-
-###################################################
-###################################################
-
-# call:  python features_avc_std_dist.py -data_dir EPOCHS -output_dir RESULTS -part_info EPOCHS/participants.txt
 def features_avc_std_dist (raw, max_s=300, fs=256, lfreq=0.5, hfreq=40):
 
-    FIL_FREQ = (lfreq, hfreq) # bandpass frequencies
+    FIL_FREQ = (lfreq, hfreq)
     THRESH_TYPE = 'both' # Fosque22: 'both'
-
-
 
     hist_x = []
     hist_y = []
-
     hist_x_raw = []
     hist_y_raw = []
 
@@ -123,8 +89,7 @@ def features_avc_std_dist (raw, max_s=300, fs=256, lfreq=0.5, hfreq=40):
 ###################################################
 def features_AVC (raw, bin_threshold, max_iei, fs=256, max_s=200, lfreq=0.5, hfreq=40):
 
-
-    FIL_FREQ = (lfreq, hfreq) # bandpass frequencies
+    FIL_FREQ = (lfreq, hfreq)
     THRESH_TYPE = 'both' # Fosque22: 'both'
 
     GAMMA_EXPONENT_RANGE = (0, 2)
@@ -158,8 +123,6 @@ def features_AVC (raw, bin_threshold, max_iei, fs=256, max_s=200, lfreq=0.5, hfr
            'data_std':[]
            }
 
-
-
     data = raw.get_data()
     nr_channels =  data.shape[0]
     sig_length = min(data.shape[1]/fs , max_s)
@@ -175,13 +138,11 @@ def features_AVC (raw, bin_threshold, max_iei, fs=256, max_s=200, lfreq=0.5, hfr
                                 thresh_type=THRESH_TYPE, null_value=0)
     events_one_chan = np.sum(events_by_chan, axis=0)
 
-
     #################################
     #    Avalanches                 #
     #################################
 
     # Detect avalanches
-    #breakpoint()
     avls, _, _, mean_iei = eop.detect_avalanches(events_by_chan, fs,
                                                     max_iei=MAX_IEI,
                                                     threshold=BIN_THRESHOLD,
@@ -190,7 +151,6 @@ def features_AVC (raw, bin_threshold, max_iei, fs=256, max_s=200, lfreq=0.5, hfr
     sizes = [x['size'] for x in avls]
     dur_bin = [x['dur_bin'] for x in avls]
     dur_sec = [x['dur_sec'] for x in avls if not np.isnan(x['dur_sec'])]  # skip NaNs
-    # dur_sec = [x['dur_sec'] for x in avls]
     len_avls = len(avls)
 
     # Skip if no valid avalanches
@@ -207,7 +167,6 @@ def features_AVC (raw, bin_threshold, max_iei, fs=256, max_s=200, lfreq=0.5, hfr
     tau = size_fit['power_law_exp']
     tau_dist = size_fit['best_fit']
     tau_dist_TR = size_fit['T_R_sum']
-
 
     #################################
     #    ALPHA                     #
@@ -310,7 +269,6 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
 
         input = []
         results = []
-        
         for ch in range(nr_channels):
             input.append((data_filt[ch,:],fs))
             
@@ -325,10 +283,8 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
         pool.join()
 
         
-
-        print ('## one round done ##')
-        results = np.array(results)
-        results_interpolated = results.copy()
+        results = np.array(results).copy()
+        results_interpolated = np.array(results).copy()
         results[bad_indices,:] = np.nan
 
         HURST_FH = np.nanmean(results[:,0])
@@ -336,7 +292,6 @@ def features_DFA(raw, lfreq, hfreq, fs=256, max_s=2000, bad_indices=None):
         HURST_FH_interpolated = np.mean(results_interpolated[:,0])
         HURST_DFA_interpolated = np.mean((results_interpolated)[:,1])
 
-        
         return HURST_FH, HURST_DFA, results, HURST_FH_interpolated, HURST_DFA_interpolated, results_interpolated
 
 ###################################################
@@ -363,8 +318,6 @@ def fixed_chaos(trial, epochs, lpfrequency):
         else:
             failed.append(1)
 
-    # print(f'Done Trial {str(trial)} Fixed {str(lpfrequency)} Hz')
-
     return K_ch, hfreq, failed
 
 
@@ -380,15 +333,11 @@ def filter_and_chaos(trial, epochs):
 
     nr_channels =  epochs.shape[1]
     for ch in range(nr_channels):
-        # select channel data
-        data_ch = data_trial[ch,:]
-        # do FOOOF to find lowst frequency peak
-        fm = FOOOF()
-        # Set the frequency range to fit the model
-        freq_range = [1, 6]
+        data_ch = data_trial[ch,:] # select channel data
+        fm = FOOOF() # do FOOOF to find lowst frequency peak
+        freq_range = [1, 6] # Set the frequency range to fit the model
         # get psd of channels
         freqs, psd_ch = signal.welch(data_ch,fs,nperseg=samples)
-
 
         fm.fit(freqs, psd_ch, freq_range)
 
@@ -406,14 +355,12 @@ def filter_and_chaos(trial, epochs):
             ch_filt = mne.filter.filter_data(data_ch, sfreq=fs, l_freq=0.5, h_freq=hfreq_tmp,verbose=False)
             K_ch.append(chaos_pipeline(ch_filt))
             hfreq.append(hfreq_tmp)
-    # print('Done Trial {}'.format(str(trial)))
-
+    
     return K_ch, hfreq, failed
 
 
 def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indices=None, good_indices=None):
 
-    # output
     Freq = []
     Nopeak = []
     K_median = []
@@ -423,7 +370,6 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
     fs = 256
     samples = epochs[0].shape[1]
 
-    # if data is too long only use the first 3 min of data
     nr_trials = min([len(epochs),max_trials]);
     nr_channels =  epochs.shape[1]
 
@@ -459,12 +405,8 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
             input.append((trial,epochs, np.float64(hfrequ)))
         if k_type == 'flex':
             input.append((trial,epochs))
-            #filter_and_chaos(trial,epochs) # comment out
-        elif ktype == 'fixed':
+        elif k_type == 'fixed':
             input.append((trial,epochs, np.float64(hfrequ)))
-
-        #filter_and_chaos(trial,epochs)
-        #fixed_chaos(trial,epochs, np.float(hfrequ))
 
     #get results for chaos test
     if k_type == 'flex':
@@ -472,24 +414,21 @@ def features_EOC(mne_epochs, k_type='flex', hfrequ=None, max_trials=30, bad_indi
     else:
         results = pool.starmap(fixed_chaos,input)
 
-    results_array_interpolated = np.array(results)
-    results_array = results_array_interpolated.copy()
+    results_array_interpolated = np.array(results).copy()
+    results_array = np.array(results).copy()
     results_array[:, :, bad_indices] = np.nan
-
-
 
     K_median = np.nanmedian(results_array[:,0,:])
     K_median_interpolated = np.nanmedian(results_array_interpolated[:,0,:])
     Freq = np.nanmean(results_array[:,1,:])
     Nopeak = np.sum(results_array[:,2,:])/(nr_trials*nr_channels)
 
-
     pool.close()
     pool.join()
 
     return K_median, K_median_interpolated, Freq, Nopeak, results_array, results_array_interpolated
 
-
+###################################################
 ###################################################
 
 def calculate_values(trial, epochs):
@@ -507,8 +446,7 @@ def calculate_values(trial, epochs):
 def features_EOS (mne_epochs, minfreq, maxfreq, fs, max_trials=30):
 
         # prepare data
-        # epochs_res = mne_epochs.resample(250)
-        epochs_res = mne_epochs
+        epochs_res = mne_epochs.copy()
         epochs_filt = epochs_res.filter(minfreq, maxfreq, verbose = False)
 
         # if data is too long only use the first 3 min of data
@@ -571,18 +509,13 @@ def get_pred(trial, epochs):
         kdf, _ = nk.fractal_katz(channel_data)
         KDF.append(kdf)
 
-    # print('Done Trial {}'.format(str(trial)))
-
     return Lyaps, Dims, Ent, LZC, KDF
-
 
 def features_Pred (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices = None):
     
-    # epochs_res = mne_epochs.resample(250)
-    epochs_res = mne_epochs
+    epochs_res = mne_epochs.copy()
     epochs_filt = epochs_res.filter(lfreq, hfreq, verbose = False)
 
-    # if data is too long only use the first 3 min of data
     nr_trials = min([len(epochs_filt),max_trials])
     epochs = epochs_filt.get_data()
     nr_channels =  epochs.shape[1]
@@ -594,34 +527,31 @@ def features_Pred (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices 
     ctx = mp.get_context("spawn")
     pool = ctx.Pool(n_cpus)
 
-    # loop over every time segment
     input = []
     for trial in range(nr_trials):
         input.append((trial,epochs))
 
     results = pool.starmap(get_pred,input)
 
-    results = np.array(results) 
+    results = np.array(results).copy()
+    results_int = np.array(results).copy()
     results[:, :, bad_indices] = np.nan
 
-    results_int = np.array(results) 
+    Lyaps_max = (np.nanmean(results[:,0,:]))
+    Dims_mean = (np.nanmean(results[:,1,:]))
+    Ent_mean = (np.nanmean(results[:,2,:]))
+    LZC_mean = (np.nanmean(results[:,3,:]))
+    KDF_mean = (np.nanmean(results[:,4,:]))
 
-    Lyaps_max = (np.nanmean(results[:,0,:],axis = (0,1)))
-    Dims_mean = (np.nanmean(results[:,1,:],axis = (0,1)))
-    Ent_mean = (np.nanmean(results[:,2,:],axis = (0,1)))
-    LZC_mean = (np.nanmean(results[:,3,:],axis = (0,1)))
-    KDF_mean = (np.nanmean(results[:,4,:],axis = (0,1)))
-
-    Lyaps_max_int = (np.nanmean(results_int[:,0,:],axis = (0,1)))
-    Dims_mean_int = (np.nanmean(results_int[:,1,:],axis = (0,1)))
-    Ent_mean_int = (np.nanmean(results_int[:,2,:],axis = (0,1)))
-    LZC_mean_int = (np.nanmean(results_int[:,3,:],axis = (0,1)))
-    KDF_mean_int = (np.nanmean(results_int[:,4,:],axis = (0,1)))
+    Lyaps_max_int = (np.nanmean(results_int[:,0,:]))
+    Dims_mean_int = (np.nanmean(results_int[:,1,:]))
+    Ent_mean_int = (np.nanmean(results_int[:,2,:]))
+    LZC_mean_int = (np.nanmean(results_int[:,3,:]))
+    KDF_mean_int = (np.nanmean(results_int[:,4,:]))
 
     pool.close()
     pool.join()
 
-    
     return Lyaps_max, Dims_mean, Ent_mean, LZC_mean, KDF_mean, Lyaps_max_int, Dims_mean_int, Ent_mean_int, LZC_mean_int, KDF_mean_int, results, results_int 
 
 ###################################################
@@ -665,9 +595,6 @@ def features_slope (mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices
     Slope_space_id[bad_indices]=np.nan
 
     return slope_id, slope_id_interpoalted, Slope_space_id, Slope_space_id_interpoalted, np.array(psds_mean), np.array(psds_mean_interpolated), np.array(psds), np.array(psds_interpoalted), np.array(freqs), 
-
-
-
 
 def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, bad_indices=None): 
     epochs = mne_epochs.get_data()
@@ -749,12 +676,9 @@ def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, ba
             bandpower_raw_per_channel, bandpower_corrected_per_channel,
             bandpower_raw_avg, bandpower_corrected_avg)
 
-
-
-
-
-###################################################
-## Methods Chaos
+###################
+## Methods Chaos ##
+###################
 def chaos_pipeline(data, sigma=0.5, denoise=False, downsample='minmax'):
     """Simplified pipeline for the modified 0-1 chaos test emulating the
     implementation from Toker et al. (2022, PNAS). This test assumes
@@ -870,8 +794,9 @@ def _minmaxsig(x):
     minmax.sort(kind='mergesort')
     return x[minmax]
 
-###################################################
-## Methods EOS
+#################
+## Methods EOS ##
+#################
 
 def pcf(data):
     """Estimate the pair correlation function (PCF) in a network of
@@ -937,8 +862,9 @@ def pcf(data):
     return pcf, orpa, orph_vector, orpa_vector
 
 
-###################################################
-## Saving
+############
+## Saving ##
+############
 
 def path_to_names(path):
     fname = os.path.basename(path)
@@ -1014,12 +940,6 @@ def update_results_table(path, row_dict, results_table_path, results_dict_dir, d
 
     print('saving is done')
 
-
-
-
-
-
-
 def get_antropy_measures(trial, epochs):
     ant_lziv = []
     ant_perm_entropy = []
@@ -1052,7 +972,6 @@ def get_antropy_measures(trial, epochs):
         ant_hjorth_mobility.append(mobility)
         ant_hjorth_complexity.append(complexity)
 
-
         #NEUROKIT
         fsi, info = nk.fishershannon_information(time_series)
         lle, info = nk.complexity_lyapunov(time_series)
@@ -1065,16 +984,11 @@ def get_antropy_measures(trial, epochs):
         nk_sampen.append(sampen)
         nk_pen.append(pen)
         nk_lzc.append(lzc)
-        
-
-
-
 
     return (ant_lziv, ant_perm_entropy, ant_spectral_entropy, ant_sample_entropy, ant_hjorth_mobility, ant_hjorth_complexity, nk_fsi, nk_lle, nk_sampen, nk_pen, nk_lzc)
 
-
-def features_Antropy(mne_epochs, lfreq=0.5, hfreq=45, fs=256, max_trials=30, bad_indices=None):
-    epochs_res = mne_epochs
+def features_Antropy(mne_epochs, lfreq=0.5, hfreq=40, fs=256, max_trials=30, bad_indices=None):
+    epochs_res = mne_epochs.copy()
     epochs_filt = epochs_res.filter(lfreq, hfreq, verbose=False)
 
     nr_trials = min(len(epochs_filt), max_trials)
@@ -1090,11 +1004,11 @@ def features_Antropy(mne_epochs, lfreq=0.5, hfreq=45, fs=256, max_trials=30, bad
 
     results = pool.starmap(get_antropy_measures, input)
 
-    results = np.array(results)
+    results = np.array(results).copy()
+    results_int = np.array(results).copy()
+
     if bad_indices is not None:
         results[:, :, bad_indices] = np.nan
-
-    results_int = np.array(results)
 
     # Average across trials and channels
     ant_lziv = np.nanmean(results[:, 0, :])
@@ -1124,7 +1038,33 @@ def features_Antropy(mne_epochs, lfreq=0.5, hfreq=45, fs=256, max_trials=30, bad
     nk_lzc_int = np.nanmean(results_int[:, 10, :])
 
     pool.close()
-    pool.join()
+    pool.join() 
+
+    results_dict = {}
+    results_dict['ant_lziv'] =                  results[:, 0, :]
+    results_dict['ant_perm_entropy'] =          results[:, 1, :]
+    results_dict['ant_spectral_entropy'] =      results[:, 2, :]
+    results_dict['ant_sample_entropy'] =        results[:, 3, :]
+    results_dict['ant_hjorth_mobility'] =       results[:, 4, :]
+    results_dict['ant_hjorth_complexity'] =     results[:, 5, :]
+    results_dict['ant_lziv_int'] =              results[:, 6, :]
+    results_dict['ant_perm_entropy_int'] =      results[:, 7, :]
+    results_dict['ant_spectral_entropy_int'] =  results[:, 8, :]
+    results_dict['ant_sample_entropy_int'] =    results[:, 9, :]
+    results_dict['ant_hjorth_mobility_int'] =   results[:, 10, :]
+    results_dict['ant_hjorth_complexity_int'] = results[:, 11, :]
+    results_dict['nk_fsi'] =                    results[:, 12, :]
+    results_dict['nk_lle'] =                    results[:, 13, :]
+    results_dict['nk_sampen'] =                 results[:, 14, :]
+    results_dict['nk_pen'] =                    results[:, 15, :]
+    results_dict['nk_lzc'] =                    results[:, 16, :]
+    results_dict['nk_fsi_int'] =                results[:, 17, :]
+    results_dict['nk_lle_int'] =                results[:, 18, :]
+    results_dict['nk_sampen_int'] =             results[:, 19, :]
+    results_dict['nk_pen_int'] =                results[:, 20, :]
+    results_dict['nk_lzc_int'] =                results[:, 21, :]
+    
+
 
     return (ant_lziv, ant_perm_entropy, ant_spectral_entropy, ant_sample_entropy,
             ant_hjorth_mobility, ant_hjorth_complexity,
@@ -1132,11 +1072,7 @@ def features_Antropy(mne_epochs, lfreq=0.5, hfreq=45, fs=256, max_trials=30, bad
             ant_sample_entropy_int, ant_hjorth_mobility_int, ant_hjorth_complexity_int,
             nk_fsi, nk_lle, nk_sampen, nk_pen, nk_lzc,
             nk_fsi_int, nk_lle_int, nk_sampen_int, nk_pen_int, nk_lzc_int,
-            results, results_int)
-
-
-
-
+            results_dict)
 
 def get_bandpower_measures(trial, epochs, fs=256):
     delta = []
@@ -1190,11 +1126,12 @@ def features_Bandpower(mne_epochs, fs=256, max_trials=30, bad_indices=None):
 
     results = pool.starmap(get_bandpower_measures, input)
 
-    results = np.array(results)
+    results = np.array(results).copy()
+    results_int = np.array(results).copy()
+
     if bad_indices is not None:
         results[:, :, bad_indices] = np.nan
 
-    results_int = np.array(results)
 
     delta = np.nanmean(results[:, 0, :])
     theta = np.nanmean(results[:, 1, :])
@@ -1215,12 +1152,8 @@ def features_Bandpower(mne_epochs, fs=256, max_trials=30, bad_indices=None):
             delta_int, theta_int, alpha_int, beta_int, gamma_int,
             results, results_int)
 
-
-
-
 ###################################################
 ###################################################
-
 
 if __name__ == "__main__":
     print("script started")
@@ -1228,34 +1161,61 @@ if __name__ == "__main__":
     print(f"Using {n_cpus} CPUs from SLURM allocation")
 
 
-    parser = argparse.ArgumentParser(description='Calculate Edge of Synchrony using different methods')
-    parser.add_argument('-device', type=str, action='store',
-                        help='decide if this script runs local (l) or ona cluster (c)')
-    parser.add_argument('-name', type=str, action='store',
-                        help='name to specify output')
-    args = parser.parse_args()
-    device = args.device
-    name = args.name
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-device', type=str, default='l')
+    parser.add_argument('--name', type=str, default='test')
+    parser.add_argument('--MAX_TRIALS', type=int, default=200, help='Maximum number of trials to use')
+    parser.add_argument('--MAX_S', type=int, default=2000, help='Maximum signal duration in seconds')
+    parser.add_argument('--start', type=int, default=0, help='Start index for paths')
+    parser.add_argument('--end', type=int, default=None, help='End index for paths')
 
-    if device == 'l':
-        results_table_path = f'output/results_l_{name}/summary.csv'
-        results_dict_dir = f'output/results_l_{name}/details/'
+    # Feature flags
+    parser.add_argument('--RUN_EOC', action='store_true')
+    parser.add_argument('--RUN_EOS', action='store_true')
+    parser.add_argument('--RUN_PRED', action='store_true')
+    parser.add_argument('--RUN_SLOPE', action='store_true')
+    parser.add_argument('--RUN_DFA', action='store_true')
+    parser.add_argument('--RUN_AVC', action='store_true')
+    parser.add_argument('--RUN_STD_DIST', action='store_true')
+    parser.add_argument('--RUN_ANTROPY', action='store_true')
+    parser.add_argument('--RUN_BANDPOWER', action='store_true')
+    parser.add_argument('--RUN_SLOPE_PSD', action='store_true')
+
+    args = parser.parse_args()
+
+    # Assign flags
+    RUN_EOC = args.RUN_EOC
+    RUN_EOS = args.RUN_EOS
+    RUN_PRED = args.RUN_PRED
+    RUN_SLOPE = args.RUN_SLOPE
+    RUN_DFA = args.RUN_DFA
+    RUN_AVC = args.RUN_AVC
+    RUN_STD_DIST = args.RUN_STD_DIST
+    RUN_ANTROPY = args.RUN_ANTROPY
+    RUN_BANDPOWER = args.RUN_BANDPOWER
+    RUN_SLOPE_PSD = args.RUN_SLOPE_PSD
+    MAX_TRIALS = args.MAX_TRIALS
+
+    if args.device == 'l':
+        results_table_path = f'output/results_l_{args.name}/summary.csv'
+        results_dict_dir = f'output/results_l_{args.name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
         paths = glob.glob('/Users/jonasmago/PhD_code_data/github/eeg_jhana/notebooks/hand_cleaning/ALL/03s/*.fif')
         paths.sort()
 
-    if device == 'c':
-        results_table_path = f'output/results_c_{name}/summary.csv'
-        results_dict_dir = f'output/results_c_{name}/details/'
+    if args.device == 'c':
+        results_table_path = f'output/results_c_{args.name}/summary.csv'
+        results_dict_dir = f'output/results_c_{args.name}/details/'
         os.makedirs(results_dict_dir, exist_ok=True)
         paths = glob.glob('/home/jmago/projects/def-michael9/jmago/jhana_eeg/data/10s/*.fif')
         paths.sort()
         # print (paths)
+    
+    paths = paths[args.start:args.end]
 
-    start = 0
-    for path_i_relative, path in enumerate(paths[start:]):
+    for path_i_relative, path in enumerate(paths):
 
-        path_i = path_i_relative+start
+        path_i = path_i_relative+args.start
         print(f"\n>>> Processing {os.path.basename(path)}")
         t_start = time.time()
         
@@ -1300,10 +1260,6 @@ if __name__ == "__main__":
         raw_32.interpolate_bads(reset_bads=True).pick('eeg')
         raw_raw.pick('eeg')
 
-
-
-
-
         fbands = [[1, 45], [1, 4], [4, 8], [8, 13], [13, 30], [30, 45]]
 
         # ========== EOC ========== #
@@ -1337,8 +1293,6 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[EOC] Error: {e}")
-                # import traceback; traceback.print_exc()
-                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== EOS ========== #
@@ -1350,8 +1304,6 @@ if __name__ == "__main__":
                 dict_data['eos_results'] = eos_results
             except Exception as e:
                 print(f"[EOS] Error: {e}")
-                # import traceback; traceback.print_exc()
-                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== PRED ========== #
@@ -1365,8 +1317,6 @@ if __name__ == "__main__":
                 dict_data['pred_results_interpolated'] = vals[11]
             except Exception as e:
                 print(f"[PRED] Error: {e}")
-                # import traceback; traceback.print_exc()
-                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== SLOPE ========== #
@@ -1387,8 +1337,6 @@ if __name__ == "__main__":
                                     }
             except Exception as e:
                 print(f"[SLOPE] Error: {e}")
-                # import traceback; traceback.print_exc()
-                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
@@ -1432,8 +1380,6 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[SLOPE_PSD] Error: {e}")
-                # import traceback; traceback.print_exc()
-                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
@@ -1456,8 +1402,6 @@ if __name__ == "__main__":
 
                 except Exception as e:
                     print(f"[DFA {fband}] Error: {e}")
-                    # import traceback; traceback.print_exc()
-                    # import pdb; pdb.set_trace()
                 update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== AVC ========== #
@@ -1473,8 +1417,6 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[AVC] Error: {e}")
-                # import traceback; traceback.print_exc()
-                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
         # ========== STD_DIST ========== #
@@ -1489,8 +1431,6 @@ if __name__ == "__main__":
 
             except Exception as e:
                 print(f"[STD_DIST] Error: {e}")
-                # import traceback; traceback.print_exc()
-                # import pdb; pdb.set_trace()
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
@@ -1505,18 +1445,16 @@ if __name__ == "__main__":
                 names = [
                     'ant_lziv', 'ant_perm_entropy', 'ant_spectral_entropy', 'ant_sample_entropy',
                     'ant_hjorth_mobility', 'ant_hjorth_complexity',
-                    'nk_fsi', 'nk_lle', 'nk_sampen', 'nk_pen', 'nk_lzc',
+                    # 'nk_fsi', 'nk_lle', 'nk_sampen', 'nk_pen', 'nk_lzc',
                     'ant_lziv_int', 'ant_perm_entropy_int', 'ant_spectral_entropy_int', 'ant_sample_entropy_int',
                     'ant_hjorth_mobility_int', 'ant_hjorth_complexity_int',
+                    'nk_fsi', 'nk_lle', 'nk_sampen', 'nk_pen', 'nk_lzc',
                     'nk_fsi_int', 'nk_lle_int', 'nk_sampen_int', 'nk_pen_int', 'nk_lzc_int'
-                ]
+                ]           
 
-                # First 12 outputs go into row_data
+                # First 22 outputs go into row_data
                 row_data.update({name: val for name, val in zip(names, vals[:22])})
-
-                # The last two are the detailed results arrays
-                dict_data['antropy_results'] = vals[22]
-                dict_data['antropy_results_int'] = vals[23]
+                dict_data.update(vals[22])
 
             except Exception as e:
                 print(f"[ANTROPY] Error: {e}")
@@ -1556,5 +1494,3 @@ if __name__ == "__main__":
         # Save results
         update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
         print(f"⏱️ Elapsed time for file: {elapsed_time_sec:.2f} seconds (finished at {current_time_est} EST)")
-
-        import pdb; pdb.set_trace()
