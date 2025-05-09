@@ -58,13 +58,13 @@ MAX_S = 2000
 RUN_EOC = False
 RUN_EOS = False
 RUN_PRED = False
-RUN_SLOPE = True
+RUN_SLOPE = False
 RUN_DFA = False
 RUN_AVC = False
 RUN_STD_DIST = False
-RUN_ANTROPY = False
+RUN_ANTROPY = True
 RUN_BANDPOWER = False
-RUN_SLOPE_PSD = True
+RUN_SLOPE_PSD = False
 
 
 # RUN_EOC = True
@@ -678,6 +678,8 @@ def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, ba
     
     # get PSD of all channels
     freqs, psds = signal.welch(data_con, fs, nperseg=5*1024)
+    psds = psds * 1e12
+
     psds_interpolated = psds.copy()
 
     # === Global Slope Estimation ===
@@ -1024,12 +1026,17 @@ def get_antropy_measures(trial, epochs):
     ant_hjorth_mobility = []
     ant_hjorth_complexity = []
 
+    nk_fsi = []
+    nk_lle = []
+    nk_sampen = []
+    nk_pen = []
+    nk_lzc = []
+    
     nr_channels = epochs.shape[1]
     trial_data = epochs[trial]
 
     for ch in range(nr_channels):
         time_series = trial_data[ch]
-
         threshold = np.median(time_series)
         binary_sequence = (time_series > threshold).astype(int)
         binary_string = ''.join(binary_sequence.astype(str))
@@ -1043,7 +1050,25 @@ def get_antropy_measures(trial, epochs):
         ant_hjorth_mobility.append(mobility)
         ant_hjorth_complexity.append(complexity)
 
-    return (ant_lziv, ant_perm_entropy, ant_spectral_entropy, ant_sample_entropy, ant_hjorth_mobility, ant_hjorth_complexity)
+
+        #NEUROKIT
+        fsi, info = nk.fishershannon_information(time_series)
+        lle, info = nk.complexity_lyapunov(time_series)
+        sampen, parameters = nk.entropy_sample(time_series)
+        pen, info = nk.entropy_permutation(time_series)
+        lzc, info = nk.complexity_lempelziv(time_series)
+
+        nk_fsi.append(fsi*10**4)
+        nk_lle.append(lle*100)
+        nk_sampen.append(sampen)
+        nk_pen.append(pen)
+        nk_lzc.append(lzc)
+        
+
+
+
+
+    return (ant_lziv, ant_perm_entropy, ant_spectral_entropy, ant_sample_entropy, ant_hjorth_mobility, ant_hjorth_complexity, nk_fsi, nk_lle, nk_sampen, nk_pen, nk_lzc)
 
 
 def features_Antropy(mne_epochs, lfreq=0.5, hfreq=45, fs=256, max_trials=30, bad_indices=None):
@@ -1076,6 +1101,12 @@ def features_Antropy(mne_epochs, lfreq=0.5, hfreq=45, fs=256, max_trials=30, bad
     ant_sample_entropy = np.nanmean(results[:, 3, :])
     ant_hjorth_mobility = np.nanmean(results[:, 4, :])
     ant_hjorth_complexity = np.nanmean(results[:, 5, :])
+    nk_fsi = np.nanmean(results[:, 6, :])
+    nk_lle = np.nanmean(results[:, 7, :])
+    nk_sampen = np.nanmean(results[:, 8, :])
+    nk_pen = np.nanmean(results[:, 9, :])
+    nk_lzc = np.nanmean(results[:, 10, :])
+
 
     ant_lziv_int = np.nanmean(results_int[:, 0, :])
     ant_perm_entropy_int = np.nanmean(results_int[:, 1, :])
@@ -1084,6 +1115,12 @@ def features_Antropy(mne_epochs, lfreq=0.5, hfreq=45, fs=256, max_trials=30, bad
     ant_hjorth_mobility_int = np.nanmean(results_int[:, 4, :])
     ant_hjorth_complexity_int = np.nanmean(results_int[:, 5, :])
 
+    nk_fsi_int = np.nanmean(results_int[:, 6, :])
+    nk_lle_int = np.nanmean(results_int[:, 7, :])
+    nk_sampen_int = np.nanmean(results_int[:, 8, :])
+    nk_pen_int = np.nanmean(results_int[:, 9, :])
+    nk_lzc_int = np.nanmean(results_int[:, 10, :])
+
     pool.close()
     pool.join()
 
@@ -1091,6 +1128,8 @@ def features_Antropy(mne_epochs, lfreq=0.5, hfreq=45, fs=256, max_trials=30, bad
             ant_hjorth_mobility, ant_hjorth_complexity,
             ant_lziv_int, ant_perm_entropy_int, ant_spectral_entropy_int,
             ant_sample_entropy_int, ant_hjorth_mobility_int, ant_hjorth_complexity_int,
+            nk_fsi, nk_lle, nk_sampen, nk_pen, nk_lzc,
+            nk_fsi_int, nk_lle_int, nk_sampen_int, nk_pen_int, nk_lzc_int,
             results, results_int)
 
 
@@ -1108,7 +1147,6 @@ def get_bandpower_measures(trial, epochs, fs=256):
     trial_data = epochs[trial]
 
     freqs, psd = signal.welch(trial_data, fs=fs, nperseg=fs*2, axis=-1)
-
     psd = psd * 1e12
 
     bands = {
@@ -1465,16 +1503,18 @@ if __name__ == "__main__":
                 names = [
                     'ant_lziv', 'ant_perm_entropy', 'ant_spectral_entropy', 'ant_sample_entropy',
                     'ant_hjorth_mobility', 'ant_hjorth_complexity',
+                    'nk_fsi', 'nk_lle', 'nk_sampen', 'nk_pen', 'nk_lzc',
                     'ant_lziv_int', 'ant_perm_entropy_int', 'ant_spectral_entropy_int', 'ant_sample_entropy_int',
-                    'ant_hjorth_mobility_int', 'ant_hjorth_complexity_int'
+                    'ant_hjorth_mobility_int', 'ant_hjorth_complexity_int',
+                    'nk_fsi_int', 'nk_lle_int', 'nk_sampen_int', 'nk_pen_int', 'nk_lzc_int'
                 ]
 
                 # First 12 outputs go into row_data
-                row_data.update({name: val for name, val in zip(names, vals[:12])})
+                row_data.update({name: val for name, val in zip(names, vals[:22])})
 
                 # The last two are the detailed results arrays
-                dict_data['antropy_results'] = vals[12]
-                dict_data['antropy_results_int'] = vals[13]
+                dict_data['antropy_results'] = vals[22]
+                dict_data['antropy_results_int'] = vals[23]
 
             except Exception as e:
                 print(f"[ANTROPY] Error: {e}")
