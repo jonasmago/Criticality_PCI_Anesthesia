@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=def-michael9
-#SBATCH --job-name=big_all
-#SBATCH --time=20:00:00
+#SBATCH --job-name=DFA
+#SBATCH --time=40:00:00
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=32G                 # Memory (up to 192 per 40 CPUs)
 #SBATCH --output=logs/final_%j.out
@@ -20,11 +20,11 @@ source ../../../venv/bin/activate
 # Run the Python script
 python FINAL_all.py \
   -device c \
-  --name may_pred \
+  --name DFA \
   --MAX_TRIALS 200 \
   --MAX_S 2000 \
-  --RUN_PRED
-  
+  --start 92 \
+  --RUN_DFA
 
 # python FINAL_all.py \
 #   -device c \
@@ -41,4 +41,5 @@ python FINAL_all.py \
 #   --RUN_AVC \
 #   --RUN_STD_DIST \
 #   --RUN_ANTROPY \
-#   --RUN_BANDPOWER
+#   --RUN_BANDPOWER\
+#   --RUN_MICROSTATES

@@ -29,6 +29,7 @@ from scipy.interpolate import interp1d
 # ====== External Libraries ======
 import mne
 import mne.io
+import mne_microstates
 import neurokit2 as nk
 from fooof import FOOOF
 from antropy import lziv_complexity
@@ -237,7 +238,7 @@ def features_AVC (raw, bin_threshold, max_iei, fs=256, max_s=200, lfreq=0.5, hfr
 
 def get_channel_hurst(ch_data,sfreq):
     scale = nk.expspace(1*sfreq, 20*sfreq, 40, base=2).astype(np.int64)
-    scale = nk.expspace(1*sfreq, 3*sfreq, 5, base=2).astype(np.int64)
+    # scale = nk.expspace(1*sfreq, 3*sfreq, 5, base=2).astype(np.int64)
 
     analytic_signal = hilbert(ch_data)
     amplitude_envelope = np.abs(analytic_signal)
@@ -313,7 +314,9 @@ def fixed_chaos(trial, epochs, lpfrequency):
         K_tmp = chaos_pipeline(ch_filt)
         K_ch.append(K_tmp)
         hfreq.append(lpfrequency)
-        if type(K_tmp) != np.nan:
+        # if type(K_tmp) != np.nan:
+        if not np.isnan(K_tmp):
+
             failed.append(0)
         else:
             failed.append(1)
@@ -625,6 +628,12 @@ def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, ba
 
     # === Channel-wise Slope Estimation and Correction ===
     Slope_space_id = []
+    fooof_models = []
+    Intercept_space_id = []
+    Alpha_peak_freqs = []
+    Alpha_peak_amps = []
+    R_squared = []
+    N_peaks = []
     psds_interpolated_corrected = np.zeros_like(psds_interpolated)
 
     for ch in range(psds_interpolated.shape[0]):
@@ -632,6 +641,34 @@ def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, ba
         fm_ch.fit(freqs, psds_interpolated[ch, :], freq_range)
         slope_ch = -fm_ch.aperiodic_params_[1]
         Slope_space_id.append(slope_ch)
+        fooof_models.append(fm_ch)
+
+        intercept_ch = fm_ch.aperiodic_params_[0]
+        Intercept_space_id.append(intercept_ch)
+
+        # Peaks
+        if fm_ch.peak_params_.shape[0] > 0:
+            # Find peak in alpha band
+            alpha_peaks = fm_ch.peak_params_[
+                (fm_ch.peak_params_[:, 0] >= 8) & (fm_ch.peak_params_[:, 0] <= 12)
+            ]
+            if len(alpha_peaks) > 0:
+                dominant = alpha_peaks[np.argmax(alpha_peaks[:, 1])]  # max power
+                Alpha_peak_freqs.append(dominant[0])
+                Alpha_peak_amps.append(dominant[1])
+            else:
+                Alpha_peak_freqs.append(np.nan)
+                Alpha_peak_amps.append(np.nan)
+        else:
+            Alpha_peak_freqs.append(np.nan)
+            Alpha_peak_amps.append(np.nan)
+
+        # Fit metrics
+        R_squared.append(fm_ch.r_squared_)
+        N_peaks.append(fm_ch.peak_params_.shape[0])
+
+
+
 
         # Subtract aperiodic background per channel
         background_ch = fm_ch._ap_fit
@@ -648,11 +685,11 @@ def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, ba
 
     # === Bandpower Computation ===
     bands = {
-        'delta': (0.5, 4),
-        'theta': (4, 8),
-        'alpha': (8, 12),
-        'beta': (12, 30),
-        'gamma': (30, 45)
+        'freq_delta': (0.5, 4),
+        'freq_theta': (4, 8),
+        'freq_alpha': (8, 12),
+        'freq_beta': (12, 30),
+        'freq_gamma': (30, 45)
     }
 
     def compute_bandpower(psd, freqs, bands):
@@ -668,13 +705,43 @@ def features_slope_bandpower(mne_epochs, lfreq, hfreq, fs=256, max_trials=30, ba
     bandpower_raw_avg = {k: np.nanmean(v) for k, v in bandpower_raw_per_channel.items()}
     bandpower_corrected_avg = {k: np.nanmean(v) for k, v in bandpower_corrected_per_channel.items()}
 
+
+    Intercept_space_id = np.array(Intercept_space_id)
+    Intercept_space_id[bad_indices] = np.nan
+
+    Alpha_peak_freqs = np.array(Alpha_peak_freqs)
+    Alpha_peak_amps = np.array(Alpha_peak_amps)
+    R_squared = np.array(R_squared)
+    N_peaks = np.array(N_peaks)
+
+    intercept_id = np.nanmean(Intercept_space_id)
+    alpha_peak_freq_avg = np.nanmean(Alpha_peak_freqs)
+    alpha_peak_amp_avg = np.nanmean(Alpha_peak_amps)
+    r_squared_avg = np.nanmean(R_squared)
+    n_peaks_avg = np.nanmean(N_peaks)
+
+
     # === Final Outputs ===
     return (slope_id, slope_id_interpolated, 
             Slope_space_id, Slope_space_id_interpolated, 
             np.array(psds_mean), np.array(psds_mean_interpolated), 
             np.array(psds), np.array(psds_interpolated), np.array(freqs),
             bandpower_raw_per_channel, bandpower_corrected_per_channel,
-            bandpower_raw_avg, bandpower_corrected_avg)
+            bandpower_raw_avg, bandpower_corrected_avg,
+            intercept_id,
+            Intercept_space_id,
+            alpha_peak_freq_avg,
+            alpha_peak_amp_avg,
+            Alpha_peak_freqs,
+            Alpha_peak_amps,
+            r_squared_avg,
+            R_squared,
+            n_peaks_avg,
+            N_peaks,
+            fooof_models,
+            psds_interpolated_corrected,
+            )
+
 
 ###################
 ## Methods Chaos ##
@@ -1047,30 +1114,35 @@ def features_Antropy(mne_epochs, lfreq=0.5, hfreq=40, fs=256, max_trials=30, bad
     results_dict['ant_sample_entropy'] =        results[:, 3, :]
     results_dict['ant_hjorth_mobility'] =       results[:, 4, :]
     results_dict['ant_hjorth_complexity'] =     results[:, 5, :]
-    results_dict['ant_lziv_int'] =              results[:, 6, :]
-    results_dict['ant_perm_entropy_int'] =      results[:, 7, :]
-    results_dict['ant_spectral_entropy_int'] =  results[:, 8, :]
-    results_dict['ant_sample_entropy_int'] =    results[:, 9, :]
-    results_dict['ant_hjorth_mobility_int'] =   results[:, 10, :]
-    results_dict['ant_hjorth_complexity_int'] = results[:, 11, :]
-    results_dict['nk_fsi'] =                    results[:, 12, :]
-    results_dict['nk_lle'] =                    results[:, 13, :]
-    results_dict['nk_sampen'] =                 results[:, 14, :]
-    results_dict['nk_pen'] =                    results[:, 15, :]
-    results_dict['nk_lzc'] =                    results[:, 16, :]
-    results_dict['nk_fsi_int'] =                results[:, 17, :]
-    results_dict['nk_lle_int'] =                results[:, 18, :]
-    results_dict['nk_sampen_int'] =             results[:, 19, :]
-    results_dict['nk_pen_int'] =                results[:, 20, :]
-    results_dict['nk_lzc_int'] =                results[:, 21, :]
+
+    results_dict['nk_fsi'] =                    results[:, 6, :]
+    results_dict['nk_lle'] =                    results[:, 7, :]
+    results_dict['nk_sampen'] =                 results[:, 8, :]
+    results_dict['nk_pen'] =                    results[:, 9, :]
+    results_dict['nk_lzc'] =                    results[:, 10, :]
+
+
+    results_dict['ant_lziv_int'] =              results[:, 0, :]
+    results_dict['ant_perm_entropy_int'] =      results[:, 1, :]
+    results_dict['ant_spectral_entropy_int'] =  results[:, 2, :]
+    results_dict['ant_sample_entropy_int'] =    results[:, 3, :]
+    results_dict['ant_hjorth_mobility_int'] =   results[:, 4, :]
+    results_dict['ant_hjorth_complexity_int'] = results[:, 5, :]
+ 
+    results_dict['nk_fsi_int'] =                results[:, 6, :]
+    results_dict['nk_lle_int'] =                results[:, 7, :]
+    results_dict['nk_sampen_int'] =             results[:, 8, :]
+    results_dict['nk_pen_int'] =                results[:, 9, :]
+    results_dict['nk_lzc_int'] =                results[:, 10, :]
     
 
 
     return (ant_lziv, ant_perm_entropy, ant_spectral_entropy, ant_sample_entropy,
             ant_hjorth_mobility, ant_hjorth_complexity,
+            nk_fsi, nk_lle, nk_sampen, nk_pen, nk_lzc,
+
             ant_lziv_int, ant_perm_entropy_int, ant_spectral_entropy_int,
             ant_sample_entropy_int, ant_hjorth_mobility_int, ant_hjorth_complexity_int,
-            nk_fsi, nk_lle, nk_sampen, nk_pen, nk_lzc,
             nk_fsi_int, nk_lle_int, nk_sampen_int, nk_pen_int, nk_lzc_int,
             results_dict)
 
@@ -1152,6 +1224,58 @@ def features_Bandpower(mne_epochs, fs=256, max_trials=30, bad_indices=None):
             delta_int, theta_int, alpha_int, beta_int, gamma_int,
             results, results_int)
 
+import numpy as np
+import mne_microstates
+
+def features_microstates(raw, n_states=4, sfreq=256, bad_indices=None):
+    import pdb; pdb.set_trace()
+
+    """
+    Extract microstate features from an MNE Raw object using mne_microstates.
+
+    Parameters:
+    - raw: MNE Raw object (must be preprocessed: EEG-referenced, filtered)
+    - n_states: number of microstates to segment
+    - sfreq: sampling frequency (default: 256 Hz)
+    - bad_indices: list of bad channels (optional, to exclude from stats)
+
+    Returns:
+    - result: dict with mean duration, coverage, and occurrence
+    - stats: full statistics for each microstate
+    - segmentation: predicted state sequence
+    - maps: microstate topographies
+    """
+
+    data = raw.get_data()
+
+    # Segment data into microstates
+    maps, segmentation = mne_microstates.segment(data, n_states=n_states)
+
+    # Compute statistics
+    stats = mne_microstates.compute_microstate_stats(segmentation, sfreq=sfreq)
+
+    # Convert to array for nan-masking
+    stats_int = stats.copy()
+    if bad_indices is not None:
+        for key in stats:
+            stats[key] = np.array(stats[key])
+            stats[key][:, bad_indices] = np.nan
+
+    # Compute means across microstates (excluding bad channels)
+    result = {
+        'microstate_duration_mean': np.nanmean(stats['duration']),
+        'microstate_occurrence_rate': np.nanmean(stats['occurrence']),
+        'microstate_coverage': np.nanmean(stats['coverage']),
+        'microstate_duration_mean_int': np.mean(stats_int['duration']),
+        'microstate_occurrence_rate_int': np.mean(stats_int['occurrence']),
+        'microstate_coverage_int': np.mean(stats_int['coverage']),
+    }
+
+    return result, stats, segmentation, maps
+
+
+
+
 ###################################################
 ###################################################
 
@@ -1180,6 +1304,7 @@ if __name__ == "__main__":
     parser.add_argument('--RUN_ANTROPY', action='store_true')
     parser.add_argument('--RUN_BANDPOWER', action='store_true')
     parser.add_argument('--RUN_SLOPE_PSD', action='store_true')
+    parser.add_argument('--RUN_MICROSTATES', action='store_true')
 
     args = parser.parse_args()
 
@@ -1194,8 +1319,11 @@ if __name__ == "__main__":
     RUN_ANTROPY = args.RUN_ANTROPY
     RUN_BANDPOWER = args.RUN_BANDPOWER
     RUN_SLOPE_PSD = args.RUN_SLOPE_PSD
-    MAX_TRIALS = args.MAX_TRIALS
+    RUN_MICROSTATES = args.RUN_MICROSTATES
 
+    MAX_TRIALS = args.MAX_TRIALS
+    MAX_S = args.MAX_S
+    
     if args.device == 'l':
         results_table_path = f'output/results_l_{args.name}/summary.csv'
         results_dict_dir = f'output/results_l_{args.name}/details/'
@@ -1325,15 +1453,16 @@ if __name__ == "__main__":
             try:
                 vals = features_slope(mne_epochs_32, lfreq=0.5, hfreq=40, fs=256, max_trials=MAX_TRIALS, bad_indices=bad_indices)
                 row_data.update({
-                    'slope_id': vals[0], 'slope_id_interpolated': vals[1]
+                    'slope_id': vals[0], 'slope_id_interpolated': vals[1],
                 })
                 dict_data['slope'] = {'Slope_space_id': vals[2], 
-                                    'Slope_space_id_interpoalted': vals[3],
+                                    'Slope_space_id_interpolated': vals[3],
                                     'psds_mean': vals[4],
                                     'psds_mean_interpolated': vals[5],
                                     'psds': vals[6],
-                                    'psds_interpoalted': vals[7],
+                                    'psds_interpolated': vals[7],
                                     'freqs': vals[8],
+                                    'fooof_models': vals[9]
                                     }
             except Exception as e:
                 print(f"[SLOPE] Error: {e}")
@@ -1350,7 +1479,12 @@ if __name__ == "__main__":
                 # Save slopes
                 row_data.update({
                     'sp_slope_id': vals[0],
-                    'sp_slope_id_interpolated': vals[1]
+                    'sp_slope_id_interpolated': vals[1],
+                    'sp_intercept_id': vals[13],
+                    'sp_alpha_peak_freq_avg': vals[15],
+                    'sp_alpha_peak_amp_avg': vals[16],
+                    'sp_r_squared_avg': vals[19],
+                    'sp_n_peaks_avg': vals[21],
                 })
 
                 # Save bandpowers to row_data: both raw and corrected, both from interpolated PSD
@@ -1375,8 +1509,18 @@ if __name__ == "__main__":
                     'sp_bandpower_raw_per_channel': vals[9],
                     'sp_bandpower_corrected_per_channel': vals[10],
                     'sp_bandpower_raw_avg': vals[11],
-                    'sp_bandpower_corrected_avg': vals[12]
-                }
+                    'sp_bandpower_corrected_avg': vals[12],
+
+
+                    'sp_Intercept_space_id': vals[14],
+                    'sp_Alpha_peak_freqs': vals[17],
+                    'sp_Alpha_peak_amps': vals[18],
+                    'sp_R_squared': vals[20],
+                    'sp_N_peaks': vals[22],
+                    
+                    'sp_fooof_models': vals[23],
+                    'sp_psds_interpolated_corrected': vals[24],
+                    }
 
             except Exception as e:
                 print(f"[SLOPE_PSD] Error: {e}")
@@ -1445,10 +1589,10 @@ if __name__ == "__main__":
                 names = [
                     'ant_lziv', 'ant_perm_entropy', 'ant_spectral_entropy', 'ant_sample_entropy',
                     'ant_hjorth_mobility', 'ant_hjorth_complexity',
-                    # 'nk_fsi', 'nk_lle', 'nk_sampen', 'nk_pen', 'nk_lzc',
-                    'ant_lziv_int', 'ant_perm_entropy_int', 'ant_spectral_entropy_int', 'ant_sample_entropy_int',
-                    'ant_hjorth_mobility_int', 'ant_hjorth_complexity_int',
                     'nk_fsi', 'nk_lle', 'nk_sampen', 'nk_pen', 'nk_lzc',
+
+                    'ant_lziv_int', 'ant_perm_entropy_int', 'ant_spectral_entropy_int', 
+                    'ant_sample_entropy_int', 'ant_hjorth_mobility_int', 'ant_hjorth_complexity_int',
                     'nk_fsi_int', 'nk_lle_int', 'nk_sampen_int', 'nk_pen_int', 'nk_lzc_int'
                 ]           
 
@@ -1477,6 +1621,18 @@ if __name__ == "__main__":
                 dict_data['bandpower_results_int'] = vals[11]
             except Exception as e:
                 print(f"[BANDPOWER] Error: {e}")
+            update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
+
+        if RUN_MICROSTATES:
+            print(">>>>> processing Microstates <<<<<")
+            try:
+                ms_result, ms_stats, ms_labels, ms_model = features_microstates(raw_32, n_states=4, sfreq=256, bad_indices=bad_indices)
+                row_data.update(ms_result)
+                dict_data['microstate_stats'] = ms_stats
+                dict_data['microstate_labels'] = ms_labels.tolist()
+                dict_data['microstate_model'] = ms_model  # optionally store parameters
+            except Exception as e:
+                print(f"[MICROSTATES] Error: {e}")
             update_results_table(path, row_data, results_table_path, results_dict_dir, dict_outputs=dict_data)
 
 
